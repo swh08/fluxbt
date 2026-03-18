@@ -1,0 +1,213 @@
+{
+  "app": {
+    "name": "FluxBT",
+    "subtitle": "Torrent Manager"
+  },
+  "server": {
+    "title": "Server",
+    "online": "Online",
+    "offline": "Offline",
+    "connecting": "Connecting..."
+  },
+  "serverDialog": {
+    "addServer": "Add Server",
+    "editServer": "Edit Server",
+    "type": "Server Type",
+    "name": "Server Name",
+    "namePlaceholder": "e.g., Home Server",
+    "host": "Host",
+    "port": "Port",
+    "username": "Username",
+    "usernamePlaceholder": "Enter username",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "cancel": "Cancel",
+    "save": "Save",
+    "add": "Add",
+    "delete": "Delete"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "transfers": "Transfers",
+    "status": "Status"
+  },
+  "status": {
+    "all": "All",
+    "downloading": "Downloading",
+    "seeding": "Seeding",
+    "paused": "Paused",
+    "queued": "Queued",
+    "error": "Error"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "servers": "Servers",
+    "serversOnline": "online",
+    "torrents": "Torrents",
+    "totalDownloadSpeed": "Total Download Speed",
+    "totalUploadSpeed": "Total Upload Speed",
+    "allTimeDownloaded": "All-time Downloaded",
+    "allTimeUploaded": "All-time Uploaded",
+    "serverOverview": "Server Overview",
+    "currentSpeed": "Current Speed",
+    "downloaded": "Downloaded",
+    "uploaded": "Uploaded",
+    "torrentsCount": "torrents"
+  },
+  "uploadDistribution": {
+    "title": "Today's Upload Distribution",
+    "geoDistribution": "Geographic Distribution",
+    "byTracker": "By Tracker",
+    "totalToday": "Today Total"
+  },
+  "transfers": {
+    "title": "Active Transfers",
+    "items": "items",
+    "searchPlaceholder": "Search torrents...",
+    "category": "Category",
+    "tags": "Tags",
+    "allCategories": "All Categories",
+    "allTags": "All Tags",
+    "add": "Add"
+  },
+  "addTorrent": {
+    "title": "Add Torrent",
+    "magnetLink": "Magnet Link",
+    "torrentFile": "Torrent File",
+    "magnetLabel": "Magnet Link / Info Hash",
+    "magnetPlaceholder": "Paste magnet link or info hash here...",
+    "fileLabel": "Select Torrent File",
+    "fileDropzone": "Click or drag file to upload",
+    "fileSelected": "Selected file",
+    "savePath": "Save Path",
+    "category": "Category",
+    "selectCategory": "Select category",
+    "noCategory": "None",
+    "tags": "Tags",
+    "startImmediately": "Start Download Immediately",
+    "yes": "Yes",
+    "no": "No",
+    "cancel": "Cancel",
+    "add": "Add Torrent",
+    "adding": "Adding..."
+  },
+  "columns": {
+    "name": "Name",
+    "progress": "Progress",
+    "dl": "DL",
+    "ul": "UL",
+    "eta": "ETA",
+    "seeds": "Seeds",
+    "peers": "Peers"
+  },
+  "details": {
+    "title": "Details",
+    "name": "Name",
+    "status": "Status",
+    "progress": "Progress",
+    "download": "Download",
+    "upload": "Upload",
+    "size": "Size",
+    "ratio": "Ratio",
+    "added": "Added",
+    "eta": "ETA",
+    "category": "Category",
+    "seeds": "Seeds",
+    "peers": "Peers",
+    "files": "Files",
+    "connectedPeers": "Connected Peers",
+    "path": "Path",
+    "tracker": "Tracker",
+    "noSelection": "No torrent selected",
+    "selectTorrent": "Select a torrent from the list to view details",
+    "transfer": "Transfer",
+    "tags": "Tags"
+  },
+  "actions": {
+    "pause": "Pause",
+    "resume": "Resume",
+    "delete": "Delete",
+    "pauseTooltip": "Pause download",
+    "resumeTooltip": "Resume download",
+    "deleteTooltip": "Remove torrent"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "language": "Language",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "background": "Background",
+    "uploadBackground": "Upload Background",
+    "clearBackground": "Clear Background",
+    "blur": "Blur",
+    "opacity": "Opacity"
+  },
+  "languages": {
+    "zh": "简体中文",
+    "en": "English"
+  },
+  "empty": {
+    "noResults": "No torrents found",
+    "tryDifferent": "Try adjusting your filters or search query"
+  },
+  "transfers": {
+    "title": "Active Transfers",
+    "items": "items",
+    "searchPlaceholder": "Search torrents...",
+    "category": "Category",
+    "tags": "Tags",
+    "allCategories": "All Categories",
+    "allTags": "All Tags",
+    "add": "Add"
+  },
+  "columns": {
+    "name": "Name",
+    "progress": "Progress",
+    "dl": "DL",
+    "ul": "UL",
+    "eta": "ETA",
+    "seeds": "Seeds",
+    "peers": "Peers",
+    "addedAt": "Added"
+  },
+  "time": {
+    "unknown": "Unknown",
+    "completed": "Done",
+    "seconds": "s",
+    "minutes": "m",
+    "hours": "h",
+    "days": "d"
+  },
+  "units": {
+    "b": "B",
+    "kb": "KB",
+    "mb": "MB",
+    "gb": "GB",
+    "tb": "TB"
+  },
+  "countries": {
+    "unitedStates": "United States",
+    "germany": "Germany",
+    "france": "France",
+    "unitedKingdom": "United Kingdom",
+    "china": "China",
+    "japan": "Japan",
+    "brazil": "Brazil",
+    "australia": "Australia",
+    "russia": "Russia",
+    "india": "India",
+    "canada": "Canada",
+    "netherlands": "Netherlands",
+    "spain": "Spain",
+    "italy": "Italy",
+    "southKorea": "South Korea",
+    "poland": "Poland",
+    "sweden": "Sweden",
+    "mexico": "Mexico",
+    "argentina": "Argentina",
+    "indonesia": "Indonesia",
+    "europe": "Europe"
+  }
+}

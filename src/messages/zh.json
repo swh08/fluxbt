@@ -1,0 +1,213 @@
+{
+  "app": {
+    "name": "FluxBT",
+    "subtitle": "种子管理器"
+  },
+  "server": {
+    "title": "服务器",
+    "online": "在线",
+    "offline": "离线",
+    "connecting": "连接中..."
+  },
+  "serverDialog": {
+    "addServer": "添加服务器",
+    "editServer": "编辑服务器",
+    "type": "服务器类型",
+    "name": "服务器名称",
+    "namePlaceholder": "例如：Home Server",
+    "host": "主机地址",
+    "port": "端口",
+    "username": "用户名",
+    "usernamePlaceholder": "输入用户名",
+    "password": "密码",
+    "passwordPlaceholder": "输入密码",
+    "cancel": "取消",
+    "save": "保存",
+    "add": "添加",
+    "delete": "删除"
+  },
+  "navigation": {
+    "dashboard": "仪表盘",
+    "transfers": "传输列表",
+    "status": "状态"
+  },
+  "status": {
+    "all": "全部",
+    "downloading": "下载中",
+    "seeding": "做种中",
+    "paused": "已暂停",
+    "queued": "排队中",
+    "error": "错误"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "servers": "服务器",
+    "serversOnline": "在线",
+    "torrents": "种子数",
+    "totalDownloadSpeed": "总下载速度",
+    "totalUploadSpeed": "总上传速度",
+    "allTimeDownloaded": "累计下载",
+    "allTimeUploaded": "累计上传",
+    "serverOverview": "服务器概览",
+    "currentSpeed": "当前速度",
+    "downloaded": "已下载",
+    "uploaded": "已上传",
+    "torrentsCount": "个种子"
+  },
+  "uploadDistribution": {
+    "title": "今日上传分布",
+    "geoDistribution": "地理位置分布",
+    "byTracker": "按 Tracker 分布",
+    "totalToday": "今日总计"
+  },
+  "transfers": {
+    "title": "活动传输",
+    "items": "项",
+    "searchPlaceholder": "搜索种子...",
+    "category": "分类",
+    "tags": "标签",
+    "allCategories": "全部分类",
+    "allTags": "全部标签",
+    "add": "添加"
+  },
+  "addTorrent": {
+    "title": "添加种子",
+    "magnetLink": "磁力链接",
+    "torrentFile": "种子文件",
+    "magnetLabel": "磁力链接 / Info Hash",
+    "magnetPlaceholder": "在此粘贴磁力链接或 Info Hash...",
+    "fileLabel": "选择种子文件",
+    "fileDropzone": "点击或拖拽文件上传",
+    "fileSelected": "已选择文件",
+    "savePath": "保存路径",
+    "category": "分类",
+    "selectCategory": "选择分类",
+    "noCategory": "无",
+    "tags": "标签",
+    "startImmediately": "立即开始下载",
+    "yes": "是",
+    "no": "否",
+    "cancel": "取消",
+    "add": "添加种子",
+    "adding": "添加中..."
+  },
+  "columns": {
+    "name": "名称",
+    "progress": "进度",
+    "dl": "下载",
+    "ul": "上传",
+    "eta": "剩余",
+    "seeds": "种子",
+    "peers": "用户"
+  },
+  "details": {
+    "title": "详情",
+    "name": "名称",
+    "status": "状态",
+    "progress": "进度",
+    "download": "下载",
+    "upload": "上传",
+    "size": "大小",
+    "ratio": "分享率",
+    "added": "添加时间",
+    "eta": "剩余时间",
+    "category": "分类",
+    "seeds": "种子",
+    "peers": "用户",
+    "files": "文件",
+    "connectedPeers": "已连接用户",
+    "path": "路径",
+    "tracker": "Tracker",
+    "noSelection": "未选择种子",
+    "selectTorrent": "从列表中选择一个种子查看详情",
+    "transfer": "传输",
+    "tags": "标签"
+  },
+  "actions": {
+    "pause": "暂停",
+    "resume": "继续",
+    "delete": "删除",
+    "pauseTooltip": "暂停下载",
+    "resumeTooltip": "继续下载",
+    "deleteTooltip": "移除种子"
+  },
+  "settings": {
+    "title": "设置",
+    "theme": "主题",
+    "language": "语言",
+    "themeLight": "浅色",
+    "themeDark": "深色",
+    "themeSystem": "跟随系统",
+    "background": "背景",
+    "uploadBackground": "上传背景图片",
+    "clearBackground": "清除背景",
+    "blur": "模糊度",
+    "opacity": "透明度"
+  },
+  "languages": {
+    "zh": "简体中文",
+    "en": "English"
+  },
+  "empty": {
+    "noResults": "未找到种子",
+    "tryDifferent": "尝试调整筛选条件或搜索关键词"
+  },
+  "transfers": {
+    "title": "活动传输",
+    "items": "项",
+    "searchPlaceholder": "搜索种子...",
+    "category": "分类",
+    "tags": "标签",
+    "allCategories": "全部分类",
+    "allTags": "全部标签",
+    "add": "添加"
+  },
+  "columns": {
+    "name": "名称",
+    "progress": "进度",
+    "dl": "下载",
+    "ul": "上传",
+    "eta": "剩余",
+    "seeds": "种子",
+    "peers": "用户",
+    "addedAt": "添加时间"
+  },
+  "time": {
+    "unknown": "未知",
+    "completed": "完成",
+    "seconds": "秒",
+    "minutes": "分钟",
+    "hours": "小时",
+    "days": "天"
+  },
+  "units": {
+    "b": "B",
+    "kb": "KB",
+    "mb": "MB",
+    "gb": "GB",
+    "tb": "TB"
+  },
+  "countries": {
+    "unitedStates": "美国",
+    "germany": "德国",
+    "france": "法国",
+    "unitedKingdom": "英国",
+    "china": "中国",
+    "japan": "日本",
+    "brazil": "巴西",
+    "australia": "澳大利亚",
+    "russia": "俄罗斯",
+    "india": "印度",
+    "canada": "加拿大",
+    "netherlands": "荷兰",
+    "spain": "西班牙",
+    "italy": "意大利",
+    "southKorea": "韩国",
+    "poland": "波兰",
+    "sweden": "瑞典",
+    "mexico": "墨西哥",
+    "argentina": "阿根廷",
+    "indonesia": "印度尼西亚",
+    "europe": "欧洲"
+  }
+}
