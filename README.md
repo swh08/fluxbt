@@ -1,6 +1,6 @@
-﻿# FluxBT
+# FluxBT
 
-[English](#english) | [涓枃](#涓枃)
+[English](#english) | [中文](#中文)
 
 ---
 
@@ -18,8 +18,8 @@ FluxBT is a modern BitTorrent transfer manager web application built with Next.j
 - **Transfer Management**: Comprehensive torrent list with status tracking, progress bars, and detailed information
 - **Multi-Server Support**: Connect and manage multiple BitTorrent servers from a single interface
 - **Responsive Design**: Fully responsive layout optimized for desktop, tablet, and mobile devices
-- **Theme Support**: Light, Dark, and System themes with custom background image option
-- **Internationalization**: Built-in support for English and Chinese languages
+- **Theme Support**: Light, Dark, and System themes with a custom background image option
+- **Internationalization**: Built-in support for English and Chinese
 - **Real-time Updates**: Live progress tracking with animated visual feedback
 
 ### Tech Stack
@@ -39,30 +39,30 @@ FluxBT is a modern BitTorrent transfer manager web application built with Next.j
 
 ### Project Structure
 
-```
+```text
 fluxbt/
-鈹溾攢鈹€ src/
-鈹?  鈹溾攢鈹€ app/                    # Next.js App Router pages
-鈹?  鈹?  鈹溾攢鈹€ layout.tsx          # Root layout with providers
-鈹?  鈹?  鈹溾攢鈹€ page.tsx            # Main application page
-鈹?  鈹?  鈹溾攢鈹€ globals.css         # Global styles
-鈹?  鈹?  鈹斺攢鈹€ api/                # API routes
-鈹?  鈹溾攢鈹€ components/
-鈹?  鈹?  鈹溾攢鈹€ ui/                 # shadcn/ui components
-鈹?  鈹?  鈹溾攢鈹€ layout/             # Layout components (Sidebar, Topbar)
-鈹?  鈹?  鈹溾攢鈹€ dashboard/          # Dashboard page components
-鈹?  鈹?  鈹溾攢鈹€ transfers/          # Transfer management components
-鈹?  鈹?  鈹溾攢鈹€ servers/            # Server management components
-鈹?  鈹?  鈹溾攢鈹€ settings/           # Settings menu component
-鈹?  鈹?  鈹溾攢鈹€ theme/              # Theme provider
-鈹?  鈹?  鈹斺攢鈹€ background/         # Background image component
-鈹?  鈹溾攢鈹€ contexts/               # React contexts (i18n, background)
-鈹?  鈹溾攢鈹€ hooks/                  # Custom React hooks
-鈹?  鈹溾攢鈹€ lib/                    # Utilities and types
-鈹?  鈹斺攢鈹€ messages/               # i18n translation files
-鈹溾攢鈹€ public/                     # Static assets
-鈹溾攢鈹€ prisma/                     # Database schema
-鈹斺攢鈹€ examples/                   # WebSocket examples
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── layout.tsx          # Root layout with providers
+│   │   ├── page.tsx            # Main application page
+│   │   ├── globals.css         # Global styles
+│   │   └── api/                # API routes
+│   ├── components/
+│   │   ├── ui/                 # shadcn/ui components
+│   │   ├── layout/             # Layout components (Sidebar, Topbar)
+│   │   ├── dashboard/          # Dashboard page components
+│   │   ├── transfers/          # Transfer management components
+│   │   ├── servers/            # Server management components
+│   │   ├── settings/           # Settings menu component
+│   │   ├── theme/              # Theme provider
+│   │   └── background/         # Background image component
+│   ├── contexts/               # React contexts (i18n, background)
+│   ├── hooks/                  # Custom React hooks
+│   ├── lib/                    # Utilities and types
+│   └── messages/               # i18n translation files
+├── prisma/                     # Database schema
+├── public/                     # Static assets
+└── scripts/                    # Local npm helper scripts
 ```
 
 ### Getting Started
@@ -85,11 +85,10 @@ fluxbt/
    npm install
    ```
 
-3. **Set up environment variables**
+3. **Create environment variables**
    ```bash
-   cp .env.example .env
+   echo DATABASE_URL=\"file:./db/custom.db\" > .env
    ```
-   Configure your environment variables as needed.
 
 4. **Initialize the database**
    ```bash
@@ -108,18 +107,19 @@ fluxbt/
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server |
+| `npm run dev` | Start the development server |
 | `npm run build` | Build for production |
-| `npm run start` | Start production server |
+| `npm run start` | Start the production server |
 | `npm run lint` | Run ESLint |
-| `npm run db:push` | Push database schema |
-| `npm run db:generate` | Generate Prisma client |
-| `npm run db:migrate` | Run database migrations |
-| `npm run db:reset` | Reset database |
+| `npm run db:push` | Push the Prisma schema to the database |
+| `npm run db:generate` | Generate Prisma Client |
+| `npm run db:migrate` | Run Prisma migrations |
+| `npm run db:reset` | Reset the database |
 
 ### Screenshots
 
 The application includes:
+
 - **Sidebar Navigation**: Quick access to Dashboard, Transfers, and Servers
 - **Statistics Cards**: Download/upload speeds, ratio, and active torrents
 - **Transfer List**: Sortable columns with status, tracker, tags, progress, and actions
@@ -127,107 +127,126 @@ The application includes:
 
 ---
 
-<a name="涓枃"></a>
+<a name="中文"></a>
 
-## 涓枃
+## 中文
 
-### 椤圭洰绠€浠?
-FluxBT 鏄竴涓熀浜?Next.js 16 鏋勫缓鐨勭幇浠ｅ寲 BitTorrent 浼犺緭绠＄悊 Web 搴旂敤銆傚畠鎻愪緵浜嗙畝娲併€佸搷搴斿紡鐨勭晫闈紝鐢ㄤ簬鐩戞帶鍜岀鐞嗚法澶氫釜鏈嶅姟鍣ㄧ殑绉嶅瓙浼犺緭銆傚簲鐢ㄥ叿鏈夊疄鏃剁粺璁°€佷紶杈撶鐞嗗拰澶氭湇鍔″櫒鏀寔绛夊姛鑳斤紝鎻愪緵鐩磋鐨勭敤鎴蜂綋楠屻€?
-### 鍔熻兘鐗规€?
-- **浠〃鐩?*锛氬疄鏃舵樉绀轰笅杞?涓婁紶閫熷害銆佹椿鍔ㄧ瀛愬拰鏈嶅姟鍣ㄧ姸鎬侊紝閰嶆湁浜や簰寮忓浘琛?- **浼犺緭绠＄悊**锛氬畬鏁寸殑绉嶅瓙鍒楄〃锛屽寘鍚姸鎬佽拷韪€佽繘搴︽潯鍜岃缁嗕俊鎭?- **澶氭湇鍔″櫒鏀寔**锛氫粠鍗曚竴鐣岄潰杩炴帴鍜岀鐞嗗涓?BitTorrent 鏈嶅姟鍣?- **鍝嶅簲寮忚璁?*锛氶拡瀵规闈€佸钩鏉垮拰绉诲姩璁惧浼樺寲鐨勫畬鍏ㄥ搷搴斿紡甯冨眬
-- **涓婚鏀寔**锛氫寒鑹层€佹殫鑹插拰绯荤粺涓婚锛屾敮鎸佽嚜瀹氫箟鑳屾櫙鍥剧墖
-- **鍥介檯鍖?*锛氬唴缃腑鏂囧拰鑻辨枃璇█鏀寔
-- **瀹炴椂鏇存柊**锛氬甫鏈夊姩鐢昏瑙夊弽棣堢殑瀹炴椂杩涘害杩借釜
+### 项目简介
 
-### 鎶€鏈爤
+FluxBT 是一个基于 Next.js 16 构建的现代化 BitTorrent 传输管理 Web 应用。它提供了简洁、响应式的界面，用于监控和管理多个服务器上的种子传输。当前项目已经具备仪表盘、传输管理、多服务器视图和国际化界面等核心前端能力。
 
-| 绫诲埆 | 鎶€鏈鏋?|
-|------|----------|
-| 妗嗘灦 | Next.js 16 (App Router) |
-| 璇█ | TypeScript |
-| 鏍峰紡 | Tailwind CSS 4 |
-| UI缁勪欢 | shadcn/ui, Radix UI |
-| 鐘舵€佺鐞?| Zustand |
-| 鍔ㄧ敾 | Framer Motion |
-| 鍥捐〃 | Recharts |
-| 鍥炬爣 | Lucide React |
-| 鏁版嵁搴?| Prisma ORM |
-| 鍖呯鐞嗗櫒 | npm |
+### 功能特性
 
-### 椤圭洰缁撴瀯
+- **仪表盘**：实时展示下载/上传速度、活动种子数量和服务器状态，并提供图表视图
+- **传输管理**：提供完整的种子列表、状态追踪、进度条和详情面板
+- **多服务器支持**：可以在同一个界面中切换和查看多个 BitTorrent 服务器
+- **响应式设计**：对桌面端、平板端和移动端都做了适配
+- **主题支持**：支持亮色、暗色和系统主题，并支持自定义背景图片
+- **国际化**：内置中英文双语支持
+- **实时更新体验**：通过动画和视觉反馈增强状态变化的可读性
 
-```
+### 技术栈
+
+| 类别 | 技术 |
+|------|------|
+| 框架 | Next.js 16 (App Router) |
+| 语言 | TypeScript |
+| 样式 | Tailwind CSS 4 |
+| UI 组件 | shadcn/ui, Radix UI |
+| 状态管理 | Zustand |
+| 动画 | Framer Motion |
+| 图表 | Recharts |
+| 图标 | Lucide React |
+| 数据库 | Prisma ORM |
+| 包管理器 | npm |
+
+### 项目结构
+
+```text
 fluxbt/
-鈹溾攢鈹€ src/
-鈹?  鈹溾攢鈹€ app/                    # Next.js App Router 椤甸潰
-鈹?  鈹?  鈹溾攢鈹€ layout.tsx          # 鏍瑰竷灞€锛堝惈providers锛?鈹?  鈹?  鈹溾攢鈹€ page.tsx            # 涓诲簲鐢ㄩ〉闈?鈹?  鈹?  鈹溾攢鈹€ globals.css         # 鍏ㄥ眬鏍峰紡
-鈹?  鈹?  鈹斺攢鈹€ api/                # API 璺敱
-鈹?  鈹溾攢鈹€ components/
-鈹?  鈹?  鈹溾攢鈹€ ui/                 # shadcn/ui 缁勪欢
-鈹?  鈹?  鈹溾攢鈹€ layout/             # 甯冨眬缁勪欢锛堜晶杈规爮銆侀《鏍忥級
-鈹?  鈹?  鈹溾攢鈹€ dashboard/          # 浠〃鐩橀〉闈㈢粍浠?鈹?  鈹?  鈹溾攢鈹€ transfers/          # 浼犺緭绠＄悊缁勪欢
-鈹?  鈹?  鈹溾攢鈹€ servers/            # 鏈嶅姟鍣ㄧ鐞嗙粍浠?鈹?  鈹?  鈹溾攢鈹€ settings/           # 璁剧疆鑿滃崟缁勪欢
-鈹?  鈹?  鈹溾攢鈹€ theme/              # 涓婚鎻愪緵鑰?鈹?  鈹?  鈹斺攢鈹€ background/         # 鑳屾櫙鍥剧墖缁勪欢
-鈹?  鈹溾攢鈹€ contexts/               # React 涓婁笅鏂囷紙鍥介檯鍖栥€佽儗鏅級
-鈹?  鈹溾攢鈹€ hooks/                  # 鑷畾涔?React Hooks
-鈹?  鈹溾攢鈹€ lib/                    # 宸ュ叿鍑芥暟鍜岀被鍨嬪畾涔?鈹?  鈹斺攢鈹€ messages/               # 鍥介檯鍖栫炕璇戞枃浠?鈹溾攢鈹€ public/                     # 闈欐€佽祫婧?鈹溾攢鈹€ prisma/                     # 鏁版嵁搴撴ā鍨?鈹斺攢鈹€ examples/                   # WebSocket 绀轰緥
+├── src/
+│   ├── app/                    # Next.js App Router 页面
+│   │   ├── layout.tsx          # 根布局与 providers
+│   │   ├── page.tsx            # 主应用页面
+│   │   ├── globals.css         # 全局样式
+│   │   └── api/                # API 路由
+│   ├── components/
+│   │   ├── ui/                 # shadcn/ui 基础组件
+│   │   ├── layout/             # 布局组件（侧边栏、顶栏）
+│   │   ├── dashboard/          # 仪表盘页面组件
+│   │   ├── transfers/          # 传输管理组件
+│   │   ├── servers/            # 服务器管理组件
+│   │   ├── settings/           # 设置菜单组件
+│   │   ├── theme/              # 主题提供者
+│   │   └── background/         # 背景图片组件
+│   ├── contexts/               # React 上下文（国际化、背景）
+│   ├── hooks/                  # 自定义 React Hooks
+│   ├── lib/                    # 工具函数和类型定义
+│   └── messages/               # 国际化翻译文件
+├── prisma/                     # 数据库模型
+├── public/                     # 静态资源
+└── scripts/                    # 本地 npm 辅助脚本
 ```
 
-### 蹇€熷紑濮?
-#### 鐜瑕佹眰
+### 快速开始
 
-- Node.js 18+锛堝唴缃?npm锛?
+#### 环境要求
+
+- Node.js 18+（含 npm）
 - npm 10+
 
-#### 瀹夎姝ラ
+#### 安装步骤
 
-1. **鍏嬮殕浠撳簱**
+1. **克隆仓库**
    ```bash
    git clone <repository-url>
    cd fluxbt
    ```
 
-2. **瀹夎渚濊禆**
+2. **安装依赖**
    ```bash
    npm install
    ```
 
-3. **閰嶇疆鐜鍙橀噺**
+3. **创建环境变量**
    ```bash
-   cp .env.example .env
+   echo DATABASE_URL=\"file:./db/custom.db\" > .env
    ```
-   鏍规嵁闇€瑕侀厤缃幆澧冨彉閲忋€?
-4. **鍒濆鍖栨暟鎹簱**
+
+4. **初始化数据库**
    ```bash
    npm run db:push
    ```
 
-5. **鍚姩寮€鍙戞湇鍔″櫒**
+5. **启动开发服务器**
    ```bash
    npm run dev
    ```
 
-6. **鎵撳紑娴忚鍣?*
-   璁块棶 `http://localhost:3000`
+6. **打开浏览器**
+   访问 `http://localhost:3000`
 
-### 鍙敤鑴氭湰
+### 可用脚本
 
-| 鍛戒护 | 璇存槑 |
+| 命令 | 说明 |
 |------|------|
-| `npm run dev` | 鍚姩寮€鍙戞湇鍔″櫒 |
-| `npm run build` | 鏋勫缓鐢熶骇鐗堟湰 |
-| `npm run start` | 鍚姩鐢熶骇鏈嶅姟鍣?|
-| `npm run lint` | 杩愯 ESLint 妫€鏌?|
-| `npm run db:push` | 鎺ㄩ€佹暟鎹簱妯″瀷 |
-| `npm run db:generate` | 鐢熸垚 Prisma 瀹㈡埛绔?|
-| `npm run db:migrate` | 杩愯鏁版嵁搴撹縼绉?|
-| `npm run db:reset` | 閲嶇疆鏁版嵁搴?|
+| `npm run dev` | 启动开发服务器 |
+| `npm run build` | 构建生产版本 |
+| `npm run start` | 启动生产服务器 |
+| `npm run lint` | 运行 ESLint 检查 |
+| `npm run db:push` | 将 Prisma 模型同步到数据库 |
+| `npm run db:generate` | 生成 Prisma Client |
+| `npm run db:migrate` | 运行 Prisma 迁移 |
+| `npm run db:reset` | 重置数据库 |
 
-### 搴旂敤鎴浘
+### 界面概览
 
-搴旂敤鍖呭惈浠ヤ笅鍔熻兘鐣岄潰锛?- **渚ц竟鏍忓鑸?*锛氬揩閫熻闂华琛ㄧ洏銆佷紶杈撳拰鏈嶅姟鍣ㄩ〉闈?- **缁熻鍗＄墖**锛氫笅杞?涓婁紶閫熷害銆佸垎浜巼鍜屾椿鍔ㄧ瀛愭暟
-- **浼犺緭鍒楄〃**锛氬彲鎺掑簭鐨勫垪锛屽寘鍚姸鎬併€乀racker銆佹爣绛俱€佽繘搴︾瓑淇℃伅
-- **绉诲姩浼樺厛璁捐**锛氬彲鎶樺彔渚ц竟鏍忓拰鍝嶅簲寮忓竷灞€
+项目当前主要包含以下界面能力：
+
+- **侧边栏导航**：快速访问仪表盘、传输和服务器页面
+- **统计卡片**：展示下载/上传速度、分享率和活动种子数
+- **传输列表**：支持按状态、Tracker、标签和进度查看任务
+- **移动优先设计**：提供可折叠侧边栏和响应式布局
 
 ---
 
@@ -238,4 +257,3 @@ MIT License
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
