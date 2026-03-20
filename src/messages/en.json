@@ -144,6 +144,31 @@
     "blur": "Blur",
     "opacity": "Opacity"
   },
+  "auth": {
+    "username": "Username",
+    "usernamePlaceholder": "Enter a username",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordPlaceholder": "Enter your password again",
+    "signIn": "Sign In",
+    "loggingIn": "Signing in...",
+    "createAccount": "Create Account",
+    "registering": "Creating account...",
+    "goToRegister": "Create one now",
+    "goToLogin": "Back to login",
+    "noAccount": "Need an account?",
+    "hasAccount": "Already have an account?",
+    "invalidCredentials": "Invalid username or password.",
+    "usernameTaken": "That username is already in use.",
+    "passwordMismatch": "The passwords do not match.",
+    "usernameRequired": "Username is required.",
+    "passwordRequired": "Password is required.",
+    "unexpectedError": "Something went wrong. Please try again.",
+    "loginFailed": "Sign in failed",
+    "registerFailed": "Registration failed",
+    "logout": "Sign Out"
+  },
   "languages": {
     "zh": "简体中文",
     "en": "English"

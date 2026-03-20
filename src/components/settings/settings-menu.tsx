@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import { useI18n } from '@/contexts/i18n-context';
 import { useBackground } from '@/contexts/background-context';
@@ -15,7 +16,7 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { Slider } from '@/components/ui/slider';
-import { Check, Sun, Moon, Monitor, Languages, Image as ImageIcon, X, Upload } from 'lucide-react';
+import { Check, Sun, Moon, Monitor, Languages, Image as ImageIcon, X, Upload, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SettingsMenuProps {
@@ -47,6 +48,15 @@ export function SettingsMenu({ children }: SettingsMenuProps) {
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleSignOut = () => {
+    const callbackUrl =
+      typeof window === 'undefined'
+        ? '/login'
+        : new URL('/login', window.location.origin).toString();
+
+    void signOut({ callbackUrl });
   };
 
   if (!mounted) {
@@ -226,6 +236,19 @@ export function SettingsMenu({ children }: SettingsMenuProps) {
               {language === 'en' && <Check className="w-4 h-4 text-primary" />}
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
+
+          <DropdownMenuSeparator className="my-2" />
+
+          <DropdownMenuItem
+            onClick={handleSignOut}
+            className={cn(
+              'flex items-center gap-2 cursor-pointer rounded-md px-2 py-1.5 text-sm',
+              'focus:bg-accent focus:text-accent-foreground text-destructive'
+            )}
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="flex-1">{t('auth.logout')}</span>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

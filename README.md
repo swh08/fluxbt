@@ -87,8 +87,9 @@ fluxbt/
 
 3. **Create environment variables**
    ```bash
-   echo DATABASE_URL=\"file:./db/custom.db\" > .env
+   cp .env.example .env
    ```
+   Then replace `NEXTAUTH_SECRET` in `.env` with your own random secret.
 
 4. **Initialize the database**
    ```bash
