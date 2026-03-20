@@ -8,6 +8,7 @@ import { MobileTopbar } from '@/components/layout/topbar';
 import { TransfersPage } from '@/components/transfers/transfers-page';
 import { mockTorrents, filterByServer } from '@/lib/mock-data';
 import { StatusFilter } from '@/lib/types';
+import type { SessionUserIdentity } from '@/lib/auth/session-user';
 
 const emptySubscribe = () => () => {};
 
@@ -34,7 +35,11 @@ function useHydrated(): boolean {
   return useSyncExternalStore(emptySubscribe, () => true, () => false);
 }
 
-export function HomeShell() {
+interface HomeShellProps {
+  currentUser?: SessionUserIdentity;
+}
+
+export function HomeShell({ currentUser }: HomeShellProps) {
   const isHydrated = useHydrated();
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
@@ -129,6 +134,7 @@ export function HomeShell() {
             title={activeFilter === null ? 'Dashboard' : 'Transfers'}
             downloadSpeed={serverTorrents.reduce((sum, torrent) => sum + torrent.downloadSpeed, 0)}
             uploadSpeed={serverTorrents.reduce((sum, torrent) => sum + torrent.uploadSpeed, 0)}
+            currentUser={currentUser}
           />
         )}
 
@@ -147,6 +153,7 @@ export function HomeShell() {
                 onServerChange={handleServerChange}
                 isMobile={isMobile}
                 isTablet={isTablet}
+                currentUser={currentUser}
               />
             </motion.div>
           ) : (
@@ -164,6 +171,7 @@ export function HomeShell() {
                 onFilterChange={handleFilterChange}
                 isMobile={isMobile}
                 isTablet={isTablet}
+                currentUser={currentUser}
               />
             </motion.div>
           )}

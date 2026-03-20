@@ -17,6 +17,7 @@ import { StatusFilter } from '@/lib/types';
 import { useState, useMemo } from 'react';
 import { useI18n } from '@/contexts/i18n-context';
 import { AnimatePresence, motion } from 'framer-motion';
+import type { SessionUserIdentity } from '@/lib/auth/session-user';
 
 interface TransfersPageProps {
   selectedServerId: string;
@@ -24,6 +25,7 @@ interface TransfersPageProps {
   onFilterChange: (filter: StatusFilter) => void;
   isMobile?: boolean;
   isTablet?: boolean;
+  currentUser?: SessionUserIdentity;
 }
 
 export function TransfersPage({ 
@@ -32,6 +34,7 @@ export function TransfersPage({
   onFilterChange,
   isMobile = false,
   isTablet = false,
+  currentUser,
 }: TransfersPageProps) {
   const { t } = useI18n();
   
@@ -115,6 +118,7 @@ export function TransfersPage({
           tags={mockTags}
           activeFilter={activeFilter}
           onFilterChange={onFilterChange}
+          currentUser={currentUser}
         />
       )}
 

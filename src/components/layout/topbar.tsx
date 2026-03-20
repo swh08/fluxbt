@@ -18,13 +18,18 @@ import {
   ArrowUp,
   Plus,
   Search,
-  Settings,
   Menu,
+  ChevronDown,
 } from 'lucide-react';
 import { formatSpeed } from '@/lib/mock-data';
 import { SettingsMenu } from '@/components/settings/settings-menu';
 import { StatusFilter } from '@/lib/types';
 import { AddTorrentDialog } from '@/components/transfers/add-torrent-dialog';
+import {
+  getSessionUserDisplayName,
+  getSessionUserInitial,
+  type SessionUserIdentity,
+} from '@/lib/auth/session-user';
 
 // Mobile Topbar - Simplified
 interface MobileTopbarProps {
@@ -33,6 +38,7 @@ interface MobileTopbarProps {
   downloadSpeed: number;
   uploadSpeed: number;
   showAddButton?: boolean;
+  currentUser?: SessionUserIdentity;
 }
 
 export function MobileTopbar({
@@ -41,9 +47,11 @@ export function MobileTopbar({
   downloadSpeed,
   uploadSpeed,
   showAddButton = true,
+  currentUser,
 }: MobileTopbarProps) {
   const { t } = useI18n();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const userInitial = getSessionUserInitial(currentUser ?? {});
 
   return (
     <>
@@ -81,9 +89,15 @@ export function MobileTopbar({
               <Plus className="w-4 h-4" />
             </Button>
           )}
-          <SettingsMenu>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Settings className="w-4 h-4" />
+          <SettingsMenu user={currentUser}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full border border-border/70 bg-background/70 p-0 shadow-xs hover:bg-background/70"
+            >
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary">
+                {userInitial}
+              </span>
             </Button>
           </SettingsMenu>
         </div>
@@ -123,6 +137,7 @@ interface TopbarProps {
   
   // Actions
   showAddButton?: boolean;
+  currentUser?: SessionUserIdentity;
 }
 
 export function Topbar({
@@ -143,9 +158,12 @@ export function Topbar({
   activeFilter,
   onFilterChange,
   showAddButton = true,
+  currentUser,
 }: TopbarProps) {
   const { t } = useI18n();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const userDisplayName = getSessionUserDisplayName(currentUser ?? {});
+  const userInitial = getSessionUserInitial(currentUser ?? {});
 
   return (
     <>
@@ -252,13 +270,23 @@ export function Topbar({
         )}
 
         {/* Settings Menu */}
-        <SettingsMenu>
+        <SettingsMenu user={currentUser}>
           <Button
             variant="ghost"
-            size="icon"
-            className="h-8 w-8"
+            className={cn(
+              'h-9 max-w-[11rem] justify-between rounded-full border border-border/70 bg-background/70 px-2.5 shadow-xs',
+              'hover:bg-background/70'
+            )}
           >
-            <Settings className="w-4 h-4" />
+            <span className="flex min-w-0 items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
+                {userInitial}
+              </span>
+              <span className="max-w-[6.5rem] truncate text-sm text-foreground lg:max-w-[8.5rem]">
+                {userDisplayName}
+              </span>
+            </span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </Button>
         </SettingsMenu>
       </div>

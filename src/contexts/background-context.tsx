@@ -1,6 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import {
+  loadPersistedBackgroundImage,
+  persistBackgroundImage,
+} from '@/lib/background-storage';
 
 interface BackgroundContextType {
   backgroundImage: string | null;
@@ -14,7 +18,6 @@ interface BackgroundContextType {
 
 const BackgroundContext = React.createContext<BackgroundContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'fluxbt-background';
 const BLUR_KEY = 'fluxbt-background-blur';
 const OPACITY_KEY = 'fluxbt-background-opacity';
 
@@ -22,48 +25,77 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
   const [backgroundImage, setBackgroundImage] = React.useState<string | null>(null);
   const [backgroundBlur, setBackgroundBlur] = React.useState(0);
   const [backgroundOpacity, setBackgroundOpacity] = React.useState(100);
-  const [mounted, setMounted] = React.useState(false);
 
-  // Load from localStorage on mount
   React.useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const savedBlur = localStorage.getItem(BLUR_KEY);
-    const savedOpacity = localStorage.getItem(OPACITY_KEY);
-    
-    if (saved) {
-      setBackgroundImage(saved);
+    let cancelled = false;
+
+    const loadBackground = async () => {
+      try {
+        const savedBackground = await loadPersistedBackgroundImage();
+
+        if (!cancelled && savedBackground) {
+          setBackgroundImage(savedBackground);
+        }
+      } catch (error) {
+        console.error('Failed to load persisted background image.', error);
+      }
+    };
+
+    let savedBlur: string | null = null;
+    let savedOpacity: string | null = null;
+
+    try {
+      savedBlur = localStorage.getItem(BLUR_KEY);
+      savedOpacity = localStorage.getItem(OPACITY_KEY);
+    } catch (error) {
+      console.error('Failed to read background display settings.', error);
     }
+
     if (savedBlur) {
       setBackgroundBlur(parseInt(savedBlur, 10));
     }
     if (savedOpacity) {
       setBackgroundOpacity(parseInt(savedOpacity, 10));
     }
+
+    void loadBackground();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const setBackground = (image: string | null) => {
     setBackgroundImage(image);
-    if (image) {
-      localStorage.setItem(STORAGE_KEY, image);
-    } else {
-      localStorage.removeItem(STORAGE_KEY);
-    }
+
+    void persistBackgroundImage(image).catch((error) => {
+      console.error('Failed to persist background image.', error);
+    });
   };
 
   const setBlur = (blur: number) => {
     setBackgroundBlur(blur);
-    localStorage.setItem(BLUR_KEY, blur.toString());
+    try {
+      localStorage.setItem(BLUR_KEY, blur.toString());
+    } catch (error) {
+      console.error('Failed to persist background blur.', error);
+    }
   };
 
   const setOpacity = (opacity: number) => {
     setBackgroundOpacity(opacity);
-    localStorage.setItem(OPACITY_KEY, opacity.toString());
+    try {
+      localStorage.setItem(OPACITY_KEY, opacity.toString());
+    } catch (error) {
+      console.error('Failed to persist background opacity.', error);
+    }
   };
 
   const clearBackground = () => {
     setBackgroundImage(null);
-    localStorage.removeItem(STORAGE_KEY);
+    void persistBackgroundImage(null).catch((error) => {
+      console.error('Failed to clear persisted background image.', error);
+    });
   };
 
   return (

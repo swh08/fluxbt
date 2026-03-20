@@ -9,15 +9,23 @@ import { mockTorrents, mockServers, filterByServer, getDashboardStats } from '@/
 import { useI18n } from '@/contexts/i18n-context';
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import type { SessionUserIdentity } from '@/lib/auth/session-user';
 
 interface DashboardPageProps {
   selectedServerId: string;
   onServerChange?: (serverId: string) => void;
   isMobile?: boolean;
   isTablet?: boolean;
+  currentUser?: SessionUserIdentity;
 }
 
-export function DashboardPage({ selectedServerId, onServerChange, isMobile = false, isTablet = false }: DashboardPageProps) {
+export function DashboardPage({
+  selectedServerId,
+  onServerChange,
+  isMobile = false,
+  isTablet = false,
+  currentUser,
+}: DashboardPageProps) {
   const { t } = useI18n();
 
   // Aggregate stats from ALL servers for top cards
@@ -38,6 +46,7 @@ export function DashboardPage({ selectedServerId, onServerChange, isMobile = fal
           title={t('dashboard.title')}
           showSpeeds={false}
           showAddButton={false}
+          currentUser={currentUser}
         />
       )}
 

@@ -18,17 +18,25 @@ import {
 import { Slider } from '@/components/ui/slider';
 import { Check, Sun, Moon, Monitor, Languages, Image as ImageIcon, X, Upload, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  getSessionUserDisplayName,
+  getSessionUserInitial,
+  type SessionUserIdentity,
+} from '@/lib/auth/session-user';
 
 interface SettingsMenuProps {
   children: React.ReactNode;
+  user?: SessionUserIdentity;
 }
 
-export function SettingsMenu({ children }: SettingsMenuProps) {
+export function SettingsMenu({ children, user }: SettingsMenuProps) {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useI18n();
   const { backgroundImage, backgroundBlur, backgroundOpacity, setBackground, setBlur, setOpacity, clearBackground } = useBackground();
   const [mounted, setMounted] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const displayName = getSessionUserDisplayName(user ?? {});
+  const userInitial = getSessionUserInitial(user ?? {});
 
   React.useEffect(() => {
     setMounted(true);
@@ -41,6 +49,10 @@ export function SettingsMenu({ children }: SettingsMenuProps) {
       reader.onload = (event) => {
         const result = event.target?.result as string;
         setBackground(result);
+        e.target.value = '';
+      };
+      reader.onerror = () => {
+        e.target.value = '';
       };
       reader.readAsDataURL(file);
     }
@@ -76,12 +88,31 @@ export function SettingsMenu({ children }: SettingsMenuProps) {
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
+          onCloseAutoFocus={(event) => event.preventDefault()}
           className={cn(
             'w-56 p-2',
             'bg-popover border-border shadow-lg',
             'rounded-lg'
           )}
         >
+          <div className="rounded-md border border-border/70 bg-muted/35 px-3 py-2">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
+                {userInitial}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-foreground">
+                  {displayName}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {t('auth.username')}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <DropdownMenuSeparator className="my-2" />
+
           {/* Theme Section */}
           <DropdownMenuLabel className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 pt-1 pb-2">
             <Sun className="w-3.5 h-3.5" />

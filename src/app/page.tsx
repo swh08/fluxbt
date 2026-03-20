@@ -9,5 +9,12 @@ export default async function HomePage() {
     redirect('/login');
   }
 
-  return <HomeShell />;
+  return (
+    <HomeShell
+      currentUser={{
+        username: session.user.username,
+        name: session.user.name,
+      }}
+    />
+  );
 }
