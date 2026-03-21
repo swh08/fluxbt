@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
+import { useBackground } from '@/contexts/background-context';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -84,9 +85,12 @@ function SidebarContent({
   onOpenChange?: (open: boolean) => void;
 }) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
   const [serverDropdownOpen, setServerDropdownOpen] = useState(false);
   const [serverDialogOpen, setServerDialogOpen] = useState(false);
   const [editingServer, setEditingServer] = useState<ServerConfig | null>(null);
+  const sidebarBorderClass = backgroundImage ? 'border-white/10' : 'border-sidebar-border';
+  const panelBorderClass = backgroundImage ? 'border-white/15' : 'border-border';
 
   const statuses: TorrentStatus[] = ['downloading', 'seeding', 'paused', 'queued', 'error'];
 
@@ -149,14 +153,19 @@ function SidebarContent({
     <>
       <aside 
         className={cn(
-          'flex-shrink-0 bg-sidebar border-r border-sidebar-border flex flex-col h-full',
+          'flex-shrink-0 border-r flex flex-col h-full',
+          sidebarBorderClass,
+          backgroundImage
+            ? 'bg-sidebar/70 backdrop-blur-xl supports-[backdrop-filter]:bg-sidebar/55'
+            : 'bg-sidebar',
           'transition-all duration-200 ease-in-out',
           isCollapsed ? 'w-16' : 'w-56'
         )}
       >
         {/* Brand Section */}
         <div className={cn(
-          'h-14 border-b border-sidebar-border flex items-center px-3',
+          'h-14 border-b flex items-center px-3',
+          sidebarBorderClass,
           isCollapsed ? 'justify-center' : ''
         )}>
           <div className="flex items-center gap-3">
@@ -200,7 +209,10 @@ function SidebarContent({
             onClick={() => setServerDropdownOpen(!serverDropdownOpen)}
             className={cn(
               'w-full px-3 py-2 rounded-lg border-2 text-left',
-              'bg-card transition-colors',
+              'transition-colors',
+              backgroundImage
+                ? 'bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55'
+                : 'bg-card',
               selectedServer.status === 'online' ? 'border-emerald-500/50' : 'border-red-500/50',
               'hover:border-primary/50'
             )}
@@ -232,7 +244,15 @@ function SidebarContent({
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
                 className="overflow-hidden"
               >
-                <div className="mt-2 border rounded-lg border-border bg-card">
+                <div
+                  className={cn(
+                    'mt-2 border rounded-lg',
+                    panelBorderClass,
+                    backgroundImage
+                      ? 'bg-card/75 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60'
+                      : 'bg-card',
+                  )}
+                >
                   {mockServers.map((server) => (
                     <div
                       key={server.id}
@@ -266,7 +286,8 @@ function SidebarContent({
                     onClick={handleAddServer}
                     className={cn(
                       'w-full p-2 text-left text-xs hover:bg-accent transition-colors',
-                      'flex items-center gap-2 border-t border-border text-primary'
+                      'flex items-center gap-2 border-t text-primary',
+                      panelBorderClass,
                     )}
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -379,7 +400,7 @@ function SidebarContent({
         </ScrollArea>
 
         {/* Footer */}
-        <div className="p-3 border-t border-sidebar-border">
+        <div className={cn('p-3 border-t', sidebarBorderClass)}>
           {!isCollapsed ? (
             <p className="text-xs text-muted-foreground text-center">
               v{selectedServer.version}
@@ -415,9 +436,21 @@ export function MobileSidebar({
   onOpenChange, 
   ...props 
 }: SidebarProps) {
+  const { backgroundImage } = useBackground();
+  const sidebarBorderClass = backgroundImage ? 'border-white/10' : 'border-sidebar-border';
+
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="p-0 w-56 bg-sidebar border-sidebar-border">
+      <SheetContent
+        side="left"
+        className={cn(
+          'p-0 w-56',
+          sidebarBorderClass,
+          backgroundImage
+            ? 'bg-sidebar/70 backdrop-blur-xl supports-[backdrop-filter]:bg-sidebar/55'
+            : 'bg-sidebar',
+        )}
+      >
         <SheetHeader className="sr-only">
           <SheetTitle>Navigation Menu</SheetTitle>
         </SheetHeader>

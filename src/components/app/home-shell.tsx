@@ -9,6 +9,8 @@ import { TransfersPage } from '@/components/transfers/transfers-page';
 import { mockTorrents, filterByServer } from '@/lib/mock-data';
 import { StatusFilter } from '@/lib/types';
 import type { SessionUserIdentity } from '@/lib/auth/session-user';
+import { useBackground } from '@/contexts/background-context';
+import { cn } from '@/lib/utils';
 
 const emptySubscribe = () => () => {};
 
@@ -40,6 +42,7 @@ interface HomeShellProps {
 }
 
 export function HomeShell({ currentUser }: HomeShellProps) {
+  const { backgroundImage } = useBackground();
   const isHydrated = useHydrated();
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
@@ -78,7 +81,12 @@ export function HomeShell({ currentUser }: HomeShellProps) {
 
   if (!isHydrated) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
+      <div
+        className={cn(
+          'flex h-screen w-full items-center justify-center',
+          backgroundImage ? 'bg-transparent' : 'bg-background',
+        )}
+      >
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 overflow-hidden rounded-xl">
             <svg className="h-12 w-12 animate-pulse" viewBox="0 0 32 32" fill="none">
@@ -109,7 +117,10 @@ export function HomeShell({ currentUser }: HomeShellProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.15 }}
-      className="flex h-screen overflow-hidden bg-background"
+      className={cn(
+        'flex h-screen overflow-hidden',
+        backgroundImage ? 'bg-transparent' : 'bg-background',
+      )}
     >
       {isMobile && (
         <MobileSidebar

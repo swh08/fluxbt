@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
+import { useBackground } from '@/contexts/background-context';
 import { ServerStats } from '@/lib/mock-data';
 import { formatBytes, formatSpeed } from '@/lib/mock-data';
 import { ArrowDown, ArrowUp, Server } from 'lucide-react';
@@ -20,11 +21,14 @@ interface ServerCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   isMobile?: boolean;
+  hasBackground?: boolean;
 }
 
-function ServerCard({ server, isSelected, onClick, isMobile }: ServerCardProps) {
+function ServerCard({ server, isSelected, onClick, isMobile, hasBackground = false }: ServerCardProps) {
   const { t } = useI18n();
   const isOnline = server.status === 'online';
+  const cardBorderClass = hasBackground ? 'border-white/15' : 'border-border';
+  const dividerBorderClass = hasBackground ? 'border-white/10' : 'border-border';
 
   return (
     <div
@@ -32,7 +36,10 @@ function ServerCard({ server, isSelected, onClick, isMobile }: ServerCardProps) 
       className={cn(
         'relative overflow-hidden rounded-lg border',
         isMobile ? 'p-3' : 'p-4',
-        'bg-card border-border',
+        cardBorderClass,
+        hasBackground
+          ? 'bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55'
+          : 'bg-card',
         'transition-all duration-200',
         isOnline && onClick && 'cursor-pointer hover:border-primary/30',
         !isOnline && 'opacity-75',
@@ -158,7 +165,8 @@ function ServerCard({ server, isSelected, onClick, isMobile }: ServerCardProps) 
       {/* Footer */}
       <div className={cn(
         'items-center justify-between',
-        isMobile ? 'hidden' : 'flex mt-4 pt-3 border-t border-border'
+        isMobile ? 'hidden' : 'flex mt-4 pt-3 border-t',
+        dividerBorderClass,
       )}>
         <span className="text-xs text-muted-foreground">
           {server.torrentsCount} {t('dashboard.torrentsCount')}
@@ -177,6 +185,7 @@ function ServerCard({ server, isSelected, onClick, isMobile }: ServerCardProps) 
 
 export function ServerCards({ servers, selectedServerId, onServerChange, isMobile = false, isTablet = false }: ServerCardsProps) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
 
   return (
     <div>
@@ -201,6 +210,7 @@ export function ServerCards({ servers, selectedServerId, onServerChange, isMobil
             isSelected={server.id === selectedServerId}
             onClick={onServerChange ? () => onServerChange(server.id) : undefined}
             isMobile={isMobile}
+            hasBackground={Boolean(backgroundImage)}
           />
         ))}
       </div>

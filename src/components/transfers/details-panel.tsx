@@ -14,6 +14,7 @@ import { ProgressBar } from '@/components/ui/progress-bar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { useBackground } from '@/contexts/background-context';
 import {
   X,
   FileText,
@@ -65,10 +66,16 @@ function DetailRow({ label, value, icon: Icon, isCompact }: DetailRowProps) {
 
 export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPanelProps) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
+  const panelBorderClass = backgroundImage ? 'border-white/15' : 'border-border';
+  const dividerBorderClass = backgroundImage ? 'border-white/10' : 'border-border';
+  const panelSurfaceClass = backgroundImage
+    ? 'bg-card/75 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60'
+    : 'bg-card';
 
   if (!torrent) {
     return (
-      <div className="h-full border rounded-lg border-border bg-card flex flex-col">
+      <div className={cn('h-full border rounded-lg flex flex-col', panelBorderClass, panelSurfaceClass)}>
         <div className="flex-1 flex flex-col items-center justify-center text-center p-4 sm:p-6">
           <div className={cn(
             'rounded-full bg-muted flex items-center justify-center mb-3',
@@ -94,10 +101,11 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
   }
 
   return (
-    <div className="h-full border rounded-lg border-border bg-card flex flex-col">
+    <div className={cn('h-full border rounded-lg flex flex-col', panelBorderClass, panelSurfaceClass)}>
       {/* Header */}
       <div className={cn(
-        'flex items-center justify-between border-b border-border',
+        'flex items-center justify-between border-b',
+        dividerBorderClass,
         isCompact ? 'px-3 py-2' : 'px-4 py-3'
       )}>
         <h3 className={cn(

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
+import { useBackground } from '@/contexts/background-context';
 
 interface TrackerData {
   name: string;
@@ -31,7 +32,11 @@ interface TrackerSegment extends TrackerData {
 
 export function TrackerPieChart({ isMobile = false }: TrackerPieChartProps) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
   const [hoveredSegment, setHoveredSegment] = useState<TrackerSegment | null>(null);
+  const cardBorderClass = backgroundImage ? 'border-white/15' : 'border-border';
+  const dividerBorderClass = backgroundImage ? 'border-white/10' : 'border-border';
+  const tooltipBorderClass = backgroundImage ? 'border-white/15' : 'border-border';
   const totalUpload = trackerData.reduce((sum, t) => sum + t.uploadGB, 0);
 
   // Calculate pie chart segments
@@ -75,7 +80,10 @@ export function TrackerPieChart({ isMobile = false }: TrackerPieChartProps) {
     <div className={cn(
       'relative overflow-hidden rounded-lg border',
       isMobile ? 'p-3' : 'p-4',
-      'bg-card border-border',
+      cardBorderClass,
+      backgroundImage
+        ? 'bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55'
+        : 'bg-card',
       'flex flex-col'
     )}>
       {/* Pie Chart - 占据主要空间 */}
@@ -108,7 +116,13 @@ export function TrackerPieChart({ isMobile = false }: TrackerPieChartProps) {
           {/* Hover tooltip */}
           {hoveredSegment && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="bg-popover/95 backdrop-blur-sm px-2 py-1 rounded-md shadow-lg border border-border text-center">
+              <div className={cn(
+                'px-2 py-1 rounded-md shadow-lg border text-center',
+                tooltipBorderClass,
+                backgroundImage
+                  ? 'bg-popover/80 backdrop-blur-xl supports-[backdrop-filter]:bg-popover/60'
+                  : 'bg-popover/95 backdrop-blur-sm',
+              )}>
                 <div className="text-xs font-medium text-foreground">{hoveredSegment.name}</div>
                 <div className="text-[10px] text-muted-foreground">
                   {hoveredSegment.uploadGB} GB ({(hoveredSegment.percentage * 100).toFixed(1)}%)
@@ -121,7 +135,8 @@ export function TrackerPieChart({ isMobile = false }: TrackerPieChartProps) {
 
       {/* Legend - 横向排列 */}
       <div className={cn(
-        'mt-2 pt-2 border-t border-border',
+        'mt-2 pt-2 border-t',
+        dividerBorderClass,
         'grid gap-x-3 gap-y-1',
         isMobile ? 'grid-cols-2 text-[10px]' : 'grid-cols-3 text-xs'
       )}>
@@ -139,7 +154,8 @@ export function TrackerPieChart({ isMobile = false }: TrackerPieChartProps) {
 
       {/* Total */}
       <div className={cn(
-        'mt-2 pt-2 border-t border-border flex justify-between',
+        'mt-2 pt-2 border-t flex justify-between',
+        dividerBorderClass,
         isMobile ? 'text-xs' : 'text-sm'
       )}>
         <span className="text-muted-foreground">{t('uploadDistribution.totalToday')}</span>

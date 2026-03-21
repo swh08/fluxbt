@@ -91,7 +91,10 @@ export function SettingsMenu({ children, user }: SettingsMenuProps) {
           onCloseAutoFocus={(event) => event.preventDefault()}
           className={cn(
             'w-56 p-2',
-            'bg-popover border-border shadow-lg',
+            'border-border rounded-lg',
+            backgroundImage
+              ? 'bg-popover/80 backdrop-blur-xl supports-[backdrop-filter]:bg-popover/60 shadow-2xl'
+              : 'bg-popover shadow-lg',
             'rounded-lg'
           )}
         >

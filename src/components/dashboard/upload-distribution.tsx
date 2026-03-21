@@ -8,6 +8,7 @@ import {
 } from 'react-simple-maps';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
+import { useBackground } from '@/contexts/background-context';
 import { mockServers, CountryUploadData } from '@/lib/mock-data';
 
 // World atlas TopoJSON URL
@@ -20,6 +21,9 @@ interface UploadDistributionMapProps {
 
 export function UploadDistributionMap({ selectedServerId, isMobile = false }: UploadDistributionMapProps) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
+  const cardBorderClass = backgroundImage ? 'border-white/15' : 'border-border';
+  const dividerBorderClass = backgroundImage ? 'border-white/10' : 'border-border';
 
   // Get selected server's upload distribution
   const selectedServer = useMemo(() => {
@@ -68,7 +72,10 @@ export function UploadDistributionMap({ selectedServerId, isMobile = false }: Up
     <div className={cn(
       'relative overflow-hidden rounded-lg border',
       isMobile ? 'p-3' : 'p-4',
-      'bg-card border-border'
+      cardBorderClass,
+      backgroundImage
+        ? 'bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55'
+        : 'bg-card',
     )}>
       {/* World Map */}
       <div className="relative w-full" style={{ height: isMobile ? 140 : 200 }}>
@@ -112,7 +119,7 @@ export function UploadDistributionMap({ selectedServerId, isMobile = false }: Up
       </div>
 
       {/* Divider */}
-      <div className="mt-3 border-t border-border" />
+      <div className={cn('mt-3 border-t', dividerBorderClass)} />
 
       {/* Legend */}
       <div className={cn(
@@ -129,7 +136,8 @@ export function UploadDistributionMap({ selectedServerId, isMobile = false }: Up
 
       {/* Total */}
       <div className={cn(
-        'mt-3 pt-3 border-t border-border flex justify-between',
+        'mt-3 pt-3 border-t flex justify-between',
+        dividerBorderClass,
         isMobile ? 'text-xs' : 'text-sm'
       )}>
         <span className="text-muted-foreground">{t('uploadDistribution.totalToday')}</span>

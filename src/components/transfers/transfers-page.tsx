@@ -16,6 +16,7 @@ import {
 import { StatusFilter } from '@/lib/types';
 import { useState, useMemo } from 'react';
 import { useI18n } from '@/contexts/i18n-context';
+import { useBackground } from '@/contexts/background-context';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { SessionUserIdentity } from '@/lib/auth/session-user';
 
@@ -37,6 +38,7 @@ export function TransfersPage({
   currentUser,
 }: TransfersPageProps) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
   
   // State
   const [searchQuery, setSearchQuery] = useState('');
@@ -140,7 +142,10 @@ export function TransfersPage({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15, ease: 'easeInOut' }}
-            className="flex-1 min-w-0 bg-background"
+            className={cn(
+              'flex-1 min-w-0',
+              backgroundImage ? 'bg-transparent' : 'bg-background',
+            )}
           >
             <TransferList
               torrents={filteredTorrents}
@@ -163,7 +168,9 @@ export function TransfersPage({
               transition={{ duration: 0.25, ease: 'easeInOut' }}
               className={cn(
                 'absolute right-0 top-0 bottom-0 z-10',
-                'border-l border-border bg-card',
+                backgroundImage
+                  ? 'border-l border-white/10 bg-card/75 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60'
+                  : 'border-l border-border bg-card',
                 isTablet ? 'w-72' : 'w-80 lg:w-96'
               )}
             >

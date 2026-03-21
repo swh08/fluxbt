@@ -25,6 +25,7 @@ import { formatSpeed } from '@/lib/mock-data';
 import { SettingsMenu } from '@/components/settings/settings-menu';
 import { StatusFilter } from '@/lib/types';
 import { AddTorrentDialog } from '@/components/transfers/add-torrent-dialog';
+import { useBackground } from '@/contexts/background-context';
 import {
   getSessionUserDisplayName,
   getSessionUserInitial,
@@ -50,12 +51,15 @@ export function MobileTopbar({
   currentUser,
 }: MobileTopbarProps) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const userInitial = getSessionUserInitial(currentUser ?? {});
+  const surfaceBorderClass = backgroundImage ? 'border-white/15' : 'border-border/70';
+  const headerBorderClass = backgroundImage ? 'border-white/10' : 'border-border';
 
   return (
     <>
-      <header className="h-12 px-3 flex items-center justify-between border-b border-border bg-card/50 backdrop-blur-sm">
+      <header className={cn('h-12 px-3 flex items-center justify-between border-b bg-card/50 backdrop-blur-sm', headerBorderClass)}>
         {/* Left - Menu */}
         <Button
           variant="ghost"
@@ -93,7 +97,13 @@ export function MobileTopbar({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full border border-border/70 bg-background/70 p-0 shadow-xs hover:bg-background/70"
+              className={cn(
+                'h-8 w-8 rounded-full border p-0 shadow-xs',
+                surfaceBorderClass,
+                backgroundImage
+                  ? 'bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45 hover:bg-background/70'
+                  : 'bg-background/70 hover:bg-background/70',
+              )}
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary">
                 {userInitial}
@@ -161,13 +171,17 @@ export function Topbar({
   currentUser,
 }: TopbarProps) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const userDisplayName = getSessionUserDisplayName(currentUser ?? {});
   const userInitial = getSessionUserInitial(currentUser ?? {});
+  const surfaceBorderClass = backgroundImage ? 'border-white/15' : 'border-border';
+  const chipBorderClass = backgroundImage ? 'border-white/15' : 'border-border/70';
+  const headerBorderClass = backgroundImage ? 'border-white/10' : 'border-border';
 
   return (
     <>
-    <header className="h-14 px-4 flex items-center justify-between border-b border-border bg-card/50 backdrop-blur-sm">
+    <header className={cn('h-14 px-4 flex items-center justify-between border-b bg-card/50 backdrop-blur-sm', headerBorderClass)}>
       {/* Left Section - Title */}
       <div className="flex items-center gap-3">
         <h2 className="text-base font-semibold text-foreground">
@@ -190,13 +204,27 @@ export function Topbar({
               placeholder={t('transfers.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => onSearchChange?.(e.target.value)}
-              className="h-8 pl-8 text-sm bg-background border-border"
+              className={cn(
+                'h-8 pl-8 text-sm',
+                surfaceBorderClass,
+                backgroundImage
+                  ? 'bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45'
+                  : 'bg-background',
+              )}
             />
           </div>
 
           {/* Category Select - Hidden on small tablet */}
           <Select value={selectedCategory} onValueChange={(v) => onCategoryChange?.(v)}>
-            <SelectTrigger className="h-8 w-28 lg:w-32 text-sm bg-background border-border hidden sm:flex">
+            <SelectTrigger
+              className={cn(
+                'h-8 w-28 lg:w-32 text-sm hidden sm:flex',
+                surfaceBorderClass,
+                backgroundImage
+                  ? 'bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45'
+                  : 'bg-background',
+              )}
+            >
               <SelectValue placeholder={t('transfers.category')} />
             </SelectTrigger>
             <SelectContent>
@@ -211,7 +239,15 @@ export function Topbar({
 
           {/* Tags Select - Hidden on tablet */}
           <Select value={selectedTag} onValueChange={(v) => onTagChange?.(v)}>
-            <SelectTrigger className="h-8 w-24 lg:w-28 text-sm bg-background border-border hidden lg:flex">
+            <SelectTrigger
+              className={cn(
+                'h-8 w-24 lg:w-28 text-sm hidden lg:flex',
+                surfaceBorderClass,
+                backgroundImage
+                  ? 'bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45'
+                  : 'bg-background',
+              )}
+            >
               <SelectValue placeholder={t('transfers.tags')} />
             </SelectTrigger>
             <SelectContent>
@@ -274,8 +310,11 @@ export function Topbar({
           <Button
             variant="ghost"
             className={cn(
-              'h-9 max-w-[11rem] justify-between rounded-full border border-border/70 bg-background/70 px-2.5 shadow-xs',
-              'hover:bg-background/70'
+              'h-9 max-w-[11rem] justify-between rounded-full border px-2.5 shadow-xs',
+              chipBorderClass,
+              backgroundImage
+                ? 'bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45 hover:bg-background/70'
+                : 'bg-background/70 hover:bg-background/70',
             )}
           >
             <span className="flex min-w-0 items-center gap-2">

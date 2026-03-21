@@ -11,7 +11,8 @@ export function BackgroundImage() {
 
   return (
     <div
-      className="fixed inset-0 z-[-1] pointer-events-none"
+      aria-hidden="true"
+      className="fixed inset-0 z-0 pointer-events-none"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',

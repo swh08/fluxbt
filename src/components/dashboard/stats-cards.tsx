@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
+import { useBackground } from '@/contexts/background-context';
 import { formatBytes, formatSpeed } from '@/lib/mock-data';
 import { DashboardStats } from '@/lib/mock-data';
 import { Server, HardDrive, ArrowDown, ArrowUp } from 'lucide-react';
@@ -23,14 +24,32 @@ interface StatCardProps {
   isMobile?: boolean;
   sparklineData?: number[];
   sparklineColor?: string;
+  hasBackground?: boolean;
 }
 
-function StatCard({ icon: Icon, label, value, subValue, iconBgColor, iconColor, valueColor, isMobile, sparklineData, sparklineColor }: StatCardProps) {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  subValue,
+  iconBgColor,
+  iconColor,
+  valueColor,
+  isMobile,
+  sparklineData,
+  sparklineColor,
+  hasBackground = false,
+}: StatCardProps) {
+  const cardBorderClass = hasBackground ? 'border-white/15' : 'border-border';
+
   return (
     <div className={cn(
       'relative overflow-hidden rounded-lg border',
       isMobile ? 'p-3' : 'p-4',
-      'bg-card border-border',
+      cardBorderClass,
+      hasBackground
+        ? 'bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55'
+        : 'bg-card',
       'transition-all duration-200 hover:border-primary/30',
       'group'
     )}>
@@ -78,6 +97,7 @@ function StatCard({ icon: Icon, label, value, subValue, iconBgColor, iconColor, 
 
 export function StatsCards({ stats, isMobile = false }: StatsCardsProps) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
 
   const cards = [
     {
@@ -128,9 +148,9 @@ export function StatsCards({ stats, isMobile = false }: StatsCardsProps) {
       isMobile 
         ? 'grid-cols-2' 
         : 'grid-cols-2 sm:grid-cols-4'
-    )}>
+      )}>
       {cards.map((card, index) => (
-        <StatCard key={index} {...card} isMobile={isMobile} />
+        <StatCard key={index} {...card} isMobile={isMobile} hasBackground={Boolean(backgroundImage)} />
       ))}
     </div>
   );
@@ -143,13 +163,18 @@ interface AllTimeStatsProps {
 
 export function AllTimeStats({ stats, isMobile = false }: AllTimeStatsProps) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
+  const cardBorderClass = backgroundImage ? 'border-white/15' : 'border-border';
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4">
       <div className={cn(
         'relative overflow-hidden rounded-lg border',
         isMobile ? 'p-3' : 'p-4',
-        'bg-card border-border'
+        cardBorderClass,
+        backgroundImage
+          ? 'bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55'
+          : 'bg-card',
       )}>
         <div className="flex items-center gap-2 sm:gap-3">
           <div className={cn(
@@ -177,7 +202,10 @@ export function AllTimeStats({ stats, isMobile = false }: AllTimeStatsProps) {
       <div className={cn(
         'relative overflow-hidden rounded-lg border',
         isMobile ? 'p-3' : 'p-4',
-        'bg-card border-border'
+        cardBorderClass,
+        backgroundImage
+          ? 'bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55'
+          : 'bg-card',
       )}>
         <div className="flex items-center gap-2 sm:gap-3">
           <div className={cn(

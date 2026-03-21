@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { useBackground } from '@/contexts/background-context';
 import {
   ArrowDown,
   ArrowUp,
@@ -35,6 +36,12 @@ interface MobileDetailsSheetProps {
 
 export function MobileDetailsSheet({ torrent, isOpen, onOpenChange }: MobileDetailsSheetProps) {
   const { t } = useI18n();
+  const { backgroundImage } = useBackground();
+  const sheetBorderClass = backgroundImage ? 'border-white/15' : 'border-border';
+  const dividerBorderClass = backgroundImage ? 'border-white/10' : 'border-border';
+  const sheetSurfaceClass = backgroundImage
+    ? 'bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60'
+    : 'bg-card';
 
   if (!torrent) return null;
 
@@ -56,8 +63,8 @@ export function MobileDetailsSheet({ torrent, isOpen, onOpenChange }: MobileDeta
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[85vh] rounded-t-xl p-0 bg-card">
-        <SheetHeader className="px-4 pt-4 pb-2 border-b border-border">
+      <SheetContent side="bottom" className={cn('h-[85vh] rounded-t-xl p-0', sheetBorderClass, sheetSurfaceClass)}>
+        <SheetHeader className={cn('px-4 pt-4 pb-2 border-b', dividerBorderClass)}>
           <SheetTitle className="text-left text-sm font-semibold line-clamp-2">
             {torrent.name}
           </SheetTitle>

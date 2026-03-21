@@ -48,8 +48,10 @@ export default function RootLayout({
           <I18nProvider>
             <BackgroundProvider>
               <BackgroundImage />
-              {children}
-              <Toaster />
+              <div className="relative z-10">
+                {children}
+                <Toaster />
+              </div>
             </BackgroundProvider>
           </I18nProvider>
         </ThemeProvider>
