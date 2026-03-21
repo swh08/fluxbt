@@ -20,24 +20,13 @@ import {
   type QbittorrentTracker,
 } from '@/lib/qbittorrent/client';
 import { combineHistorySeries, getSpeedHistory, recordSpeedSample } from '@/lib/qbittorrent/history';
+import { getTrackerHostLabel } from '@/lib/trackers';
 import { mapQbittorrentStateToStatus } from '@/lib/torrent-status';
 
 const TAG_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444', '#14B8A6'];
 
 function clampProgress(progress: number) {
   return Math.max(0, Math.min(100, Math.round(progress * 100)));
-}
-
-function getHostLabel(raw: string) {
-  if (!raw) {
-    return 'Unknown';
-  }
-
-  try {
-    return new URL(raw).hostname.replace(/^www\./, '');
-  } catch {
-    return raw.replace(/^https?:\/\//, '').split('/')[0] || raw;
-  }
 }
 
 function getStringColor(input: string) {
@@ -277,7 +266,7 @@ export function buildTrackerShares(torrents: Torrent[]): TrackerShare[] {
   const totalUploaded = torrents.reduce((sum, torrent) => sum + torrent.totalUploaded, 0);
 
   for (const torrent of torrents) {
-    const trackerName = getHostLabel(torrent.trackers[0] ?? 'Unknown');
+    const trackerName = getTrackerHostLabel(torrent.trackers[0] ?? 'Unknown');
     grouped.set(trackerName, (grouped.get(trackerName) ?? 0) + torrent.totalUploaded);
   }
 

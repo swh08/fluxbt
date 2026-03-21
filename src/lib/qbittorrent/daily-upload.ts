@@ -3,6 +3,7 @@ import type { CountryUploadShare, Torrent, TrackerShare } from '@/lib/types';
 import { db } from '@/lib/db';
 import { QbittorrentClient } from '@/lib/qbittorrent/client';
 import { getDateKeyInTimeZone, normalizeTimeZone } from '@/lib/timezones';
+import { getTrackerHostLabel } from '@/lib/trackers';
 
 interface StoredPeerState {
   uploadedBytes: number;
@@ -22,18 +23,6 @@ interface DailyUploadVisuals {
   countryUploads: CountryUploadShare[];
   trackerShares: TrackerShare[];
   sampledAt: string | null;
-}
-
-function getTrackerName(raw: string) {
-  if (!raw) {
-    return 'Unknown';
-  }
-
-  try {
-    return new URL(raw).hostname.replace(/^www\./, '') || 'Unknown';
-  } catch {
-    return raw.replace(/^https?:\/\//, '').split('/')[0] || 'Unknown';
-  }
 }
 
 function parseJsonRecord<T>(raw: string | null | undefined, fallback: T): T {
@@ -166,7 +155,7 @@ export async function buildDailyUploadVisuals(
       continue;
     }
 
-    const trackerName = getTrackerName(result.value.torrent.trackers[0] ?? '');
+    const trackerName = getTrackerHostLabel(result.value.torrent.trackers[0] ?? '');
 
     for (const [peerId, peer] of Object.entries(result.value.peers.peers ?? {})) {
       const peerKey = `${result.value.torrent.id}|${peerId}`;

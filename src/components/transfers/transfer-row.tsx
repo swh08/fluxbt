@@ -4,6 +4,8 @@ import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
 import { Torrent } from '@/lib/types';
 import { formatBytes, formatSpeedShort, formatETA } from '@/lib/formatters';
+import { getTrackerHostLabel } from '@/lib/trackers';
+import { getCategoryBadgeLabel } from '@/components/transfers/category-badge';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { Button } from '@/components/ui/button';
@@ -26,6 +28,7 @@ interface TransferRowProps {
 // Mobile Card Row
 export function MobileTransferRow({ torrent, isSelected, onClick }: TransferRowProps) {
   const { t } = useI18n();
+  const categoryBadgeLabel = getCategoryBadgeLabel(torrent.category);
 
   return (
     <div
@@ -62,7 +65,7 @@ export function MobileTransferRow({ torrent, isSelected, onClick }: TransferRowP
               <StatusBadge status={torrent.status} size="sm" />
               {torrent.trackers[0] && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 font-mono">
-                  {torrent.trackers[0].replace(/^https?:\/\/|\/.*$/g, '').split('.')[0]}
+                  {getTrackerHostLabel(torrent.trackers[0])}
                 </span>
               )}
               {torrent.tags.map((tag) => (
@@ -70,9 +73,11 @@ export function MobileTransferRow({ torrent, isSelected, onClick }: TransferRowP
                   {tag}
                 </span>
               ))}
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
-                {torrent.type}
-              </span>
+              {categoryBadgeLabel && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
+                  {categoryBadgeLabel}
+                </span>
+              )}
             </div>
             <span className="text-[10px] text-muted-foreground flex-shrink-0">
               {formatBytes(torrent.size)}
@@ -134,6 +139,7 @@ export function MobileTransferRow({ torrent, isSelected, onClick }: TransferRowP
 // Desktop/Tablet Row
 export function TransferRow({ torrent, isSelected, onClick, onAction }: TransferRowProps) {
   const { t } = useI18n();
+  const categoryBadgeLabel = getCategoryBadgeLabel(torrent.category);
 
   const handleActionClick = (e: React.MouseEvent, action: 'pause' | 'resume' | 'delete') => {
     e.stopPropagation();
@@ -171,10 +177,9 @@ export function TransferRow({ torrent, isSelected, onClick, onAction }: Transfer
           {torrent.name}
         </h3>
         <div className="flex items-center gap-1.5 flex-wrap text-xs text-muted-foreground">
-          <StatusBadge status={torrent.status} size="sm" />
           {torrent.trackers[0] && (
             <span className="px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 text-[10px] font-mono">
-              {torrent.trackers[0].replace(/^https?:\/\/|\/.*$/g, '').split('.')[0]}
+              {getTrackerHostLabel(torrent.trackers[0])}
             </span>
           )}
           {torrent.tags.map((tag) => (
@@ -182,9 +187,11 @@ export function TransferRow({ torrent, isSelected, onClick, onAction }: Transfer
               {tag}
             </span>
           ))}
-          <span className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[10px]">
-            {torrent.type}
-          </span>
+          {categoryBadgeLabel && (
+            <span className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[10px]">
+              {categoryBadgeLabel}
+            </span>
+          )}
         </div>
       </div>
 
@@ -201,6 +208,11 @@ export function TransferRow({ torrent, isSelected, onClick, onAction }: Transfer
           {torrent.progress}%
         </span>
         <ProgressBar progress={torrent.progress} status={torrent.status} />
+      </div>
+
+      {/* Status Column - w-20 lg:w-24 */}
+      <div className="w-20 lg:w-24 flex-shrink-0">
+        <StatusBadge status={torrent.status} size="sm" />
       </div>
 
       {/* Download Speed Column - w-20 lg:w-24 */}

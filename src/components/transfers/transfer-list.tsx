@@ -134,7 +134,7 @@ export function TransferList({
   // Mobile layout - card list
   if (isMobile) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="flex h-full min-h-0 flex-col">
         {/* Mobile sort header */}
         <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30">
           <span className="text-xs text-muted-foreground">
@@ -164,7 +164,7 @@ export function TransferList({
         </div>
 
         {/* Card List */}
-        <ScrollArea className="flex-1">
+        <ScrollArea className="min-h-0 flex-1">
           <div className="p-2 space-y-2">
             {sortedTorrents.map((torrent, index) => (
               <motion.div
@@ -192,7 +192,7 @@ export function TransferList({
 
   // Desktop/Tablet layout - table
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       {/* Table Header */}
       <div className="hidden sm:flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/30 text-xs font-medium text-muted-foreground uppercase tracking-wider">
         {/* Status indicator - w-1 */}
@@ -224,6 +224,11 @@ export function TransferList({
           <span>{t('columns.progress')}</span>
           {renderSortIcon('progress')}
         </button>
+
+        {/* Status - w-20 lg:w-24 */}
+        <div className="w-20 lg:w-24 flex-shrink-0">
+          <span>{t('navigation.status')}</span>
+        </div>
 
         {/* Download Speed - w-20 lg:w-24 */}
         <button
@@ -273,7 +278,7 @@ export function TransferList({
       </div>
 
       {/* Table Body */}
-      <ScrollArea className="flex-1">
+      <ScrollArea className="min-h-0 flex-1">
         <div>
           {sortedTorrents.map((torrent, index) => (
             <motion.div

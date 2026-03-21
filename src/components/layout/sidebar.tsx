@@ -206,7 +206,7 @@ function SidebarContent({
 
         {/* Server Selector - only show when expanded */}
         <div className={cn(
-          'mx-3 mt-3 transition-opacity duration-200',
+          'mx-2 mt-3 transition-opacity duration-200',
           isCollapsed ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'
         )}>
           {selectedServer ? (
@@ -407,7 +407,7 @@ function SidebarContent({
                     <Icon className={cn('w-4 h-4 flex-shrink-0', statusColors[status])} />
                     {!isCollapsed && <span>{t(`status.${status}`)}</span>}
                   </div>
-                  {!isCollapsed && count > 0 && (
+                  {!isCollapsed && (
                     <Badge variant="secondary" className="h-5 px-1.5 text-xs flex-shrink-0">
                       {count}
                     </Badge>

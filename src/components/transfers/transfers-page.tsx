@@ -13,6 +13,8 @@ import { useBackground } from '@/contexts/background-context';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { SessionUserIdentity } from '@/lib/auth/session-user';
 import { hydrateTorrentDetails } from '@/lib/client-data';
+import { shouldResetSelectedTorrentDetails } from '@/components/transfers/selection-state';
+import { mergeSelectedTorrent } from '@/components/transfers/selected-torrent';
 
 interface TransfersPageProps {
   selectedServerId: string;
@@ -126,19 +128,26 @@ export function TransfersPage({
     };
 
     void loadTorrentDetails();
+    const intervalId = window.setInterval(() => {
+      void loadTorrentDetails();
+    }, 5000);
 
     return () => {
       cancelled = true;
+      window.clearInterval(intervalId);
     };
   }, [selectedServerId, selectedTorrentId]);
 
-  const selectedTorrent = selectedTorrentDetails?.id === selectedTorrentId
-    ? selectedTorrentDetails
-    : baseSelectedTorrent;
+  const selectedTorrent = mergeSelectedTorrent(baseSelectedTorrent, selectedTorrentDetails);
 
   const handleSelect = (id: string) => {
+    const shouldResetDetails = shouldResetSelectedTorrentDetails(selectedTorrentId, id);
+
     setSelectedTorrentId(id);
-    setSelectedTorrentDetails(null);
+
+    if (shouldResetDetails) {
+      setSelectedTorrentDetails(null);
+    }
 
     if (isMobile) {
       setDetailsSheetOpen(true);
@@ -240,7 +249,7 @@ export function TransfersPage({
       )}
 
       <div
-        className="relative flex min-h-0 flex-1"
+        className="flex min-h-0 flex-1 overflow-hidden"
         onClick={(event) => {
           const target = event.target as HTMLElement;
           const isClickOnTorrent = target.closest('[data-torrent-row]');
@@ -255,11 +264,15 @@ export function TransfersPage({
         <AnimatePresence mode="wait">
           <motion.div
             key={activeFilter}
+            layout
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15, ease: 'easeInOut' }}
-            className={cn('min-w-0 flex-1', backgroundImage ? 'bg-transparent' : 'bg-background')}
+            className={cn(
+              'min-h-0 min-w-0 flex-1 overflow-hidden',
+              backgroundImage ? 'bg-transparent' : 'bg-background',
+            )}
           >
             <TransferList
               torrents={filteredTorrents}
@@ -275,16 +288,14 @@ export function TransfersPage({
           {!isMobile && selectedTorrent && (
             <motion.div
               key="details-panel"
+              layout
               data-details-panel
-              initial={{ x: '100%', opacity: 0 }}
+              initial={{ x: 24, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              exit={{ x: '100%', opacity: 0 }}
+              exit={{ x: 24, opacity: 0 }}
               transition={{ duration: 0.25, ease: 'easeInOut' }}
               className={cn(
-                'absolute bottom-0 right-0 top-0 z-10',
-                backgroundImage
-                  ? 'border-l border-white/10 bg-card/75 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60'
-                  : 'border-l border-border bg-card',
+                'min-h-0 flex-shrink-0 overflow-hidden',
                 isTablet ? 'w-72' : 'w-80 lg:w-96',
               )}
             >

@@ -15,8 +15,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useBackground } from '@/contexts/background-context';
+import { getPreferredTracker, getTrackerHostLabel } from '@/lib/trackers';
+import { getCategoryBadgeLabel } from '@/components/transfers/category-badge';
 import {
   X,
+  Download,
+  Upload,
+  Timer,
+  Sprout,
+  UsersRound,
   FileText,
   Users,
   ArrowDown,
@@ -75,7 +82,7 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
 
   if (!torrent) {
     return (
-      <div className={cn('h-full border rounded-lg flex flex-col', panelBorderClass, panelSurfaceClass)}>
+      <div className={cn('flex h-full min-h-0 flex-col border rounded-none', panelBorderClass, panelSurfaceClass)}>
         <div className="flex-1 flex flex-col items-center justify-center text-center p-4 sm:p-6">
           <div className={cn(
             'rounded-full bg-muted flex items-center justify-center mb-3',
@@ -100,8 +107,12 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
     );
   }
 
+  const preferredTracker = getPreferredTracker(torrent.trackers);
+  const categoryBadgeLabel = getCategoryBadgeLabel(torrent.category);
+  const ContentWrapper = isCompact ? ScrollArea : 'div';
+
   return (
-    <div className={cn('h-full border rounded-lg flex flex-col', panelBorderClass, panelSurfaceClass)}>
+    <div className={cn('flex h-full min-h-0 flex-col border rounded-none', panelBorderClass, panelSurfaceClass)}>
       {/* Header */}
       <div className={cn(
         'flex items-center justify-between border-b',
@@ -124,8 +135,15 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
         )}
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className={cn('space-y-3', isCompact ? 'p-3' : 'p-4 space-y-4')}>
+      <ContentWrapper
+        className={cn(
+          'min-h-0 flex-1',
+          isCompact
+            ? '[&>[data-slot=scroll-area-viewport]>div]:min-w-0 [&>[data-slot=scroll-area-viewport]>div]:w-full'
+            : 'overflow-hidden',
+        )}
+      >
+        <div className={cn('min-w-0 w-full', isCompact ? 'flex flex-col gap-3 p-3' : 'flex h-full flex-col gap-4 p-4')}>
           {/* Name Section */}
           <div>
             <h4 className={cn(
@@ -136,10 +154,10 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
             </h4>
             <div className="flex items-center gap-1.5 flex-wrap mb-2">
               <StatusBadge status={torrent.status} size={isCompact ? 'sm' : 'default'} />
-              {torrent.trackers[0] && (
-                <Badge variant="outline" className={cn('font-mono', isCompact ? 'text-[10px] px-1' : 'text-xs')}>
-                  {torrent.trackers[0].replace(/^https?:\/\/|\/.*$/g, '').split('.')[0]}
-                </Badge>
+              {preferredTracker && (
+                <span className="px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 text-[10px] font-mono">
+                  {getTrackerHostLabel(preferredTracker)}
+                </span>
               )}
               {torrent.tags.map((tag) => (
                 <Badge
@@ -150,9 +168,11 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
                   {tag}
                 </Badge>
               ))}
-              <Badge variant="outline" className={cn(isCompact ? 'text-[10px] px-1' : 'text-xs')}>
-                {torrent.type}
-              </Badge>
+              {categoryBadgeLabel && (
+                <Badge variant="outline" className={cn(isCompact ? 'text-[10px] px-1' : 'text-xs')}>
+                  {categoryBadgeLabel}
+                </Badge>
+              )}
             </div>
             <ProgressBar
               progress={torrent.progress}
@@ -170,25 +190,17 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
             <DetailRow
               label={t('details.download')}
               value={
-                <div className="flex items-center gap-1 text-blue-500">
-                  <ArrowDown className={cn(isCompact ? 'w-3 h-3' : 'w-3.5 h-3.5')} />
-                  <span className="font-mono">
-                    {formatSpeed(torrent.downloadSpeed)}
-                  </span>
-                </div>
+                <span className="font-mono text-blue-500">{formatSpeed(torrent.downloadSpeed)}</span>
               }
+              icon={Download}
               isCompact={isCompact}
             />
             <DetailRow
               label={t('details.upload')}
               value={
-                <div className="flex items-center gap-1 text-emerald-500">
-                  <ArrowUp className={cn(isCompact ? 'w-3 h-3' : 'w-3.5 h-3.5')} />
-                  <span className="font-mono">
-                    {formatSpeed(torrent.uploadSpeed)}
-                  </span>
-                </div>
+                <span className="font-mono text-emerald-500">{formatSpeed(torrent.uploadSpeed)}</span>
               }
+              icon={Upload}
               isCompact={isCompact}
             />
             <DetailRow
@@ -218,6 +230,7 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
                     : formatETA(torrent.eta)}
                 </span>
               }
+              icon={Timer}
               isCompact={isCompact}
             />
             {!isCompact && (
@@ -234,8 +247,8 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
                 <DetailRow
                   label={t('details.tracker')}
                   value={
-                    <span className="text-xs truncate" title={torrent.trackers[0]}>
-                      {torrent.trackers[0]}
+                    <span className="text-xs truncate" title={preferredTracker ?? undefined}>
+                      {getTrackerHostLabel(preferredTracker ?? '')}
                     </span>
                   }
                   icon={Globe}
@@ -245,21 +258,25 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
             <DetailRow
               label={t('details.seeds')}
               value={<span className="font-mono">{torrent.seeds}</span>}
+              icon={Sprout}
               isCompact={isCompact}
             />
             <DetailRow
               label={t('details.peers')}
               value={<span className="font-mono">{torrent.peers}</span>}
+              icon={UsersRound}
               isCompact={isCompact}
             />
           </div>
 
           <Separator />
 
+          <div className={cn(!isCompact && 'min-h-0 flex flex-1 flex-col gap-4')}>
+
           {/* Files Section - Hidden in compact mode */}
           {!isCompact && (
             <>
-              <div>
+              <div className="min-h-0 min-w-0 w-full max-h-1/2 flex flex-col">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
                   <FileText className="w-4 h-4" />
                   <span>{t('details.files')}</span>
@@ -267,16 +284,16 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
                     {torrent.files.length}
                   </Badge>
                 </div>
-                <div className="space-y-1 max-h-32 overflow-y-auto scrollbar-thin">
+                <div className="min-h-0 min-w-0 w-full flex-1 space-y-1 overflow-y-auto scrollbar-thin">
                   {torrent.files.map((file) => (
                     <div
                       key={file.id}
-                      className="flex items-center justify-between py-1.5 px-2 rounded bg-secondary/50 text-xs"
+                      className="flex min-w-0 items-center justify-between gap-2 overflow-hidden rounded bg-secondary/50 px-2 py-1.5 text-xs"
                     >
-                      <span className="truncate flex-1 text-muted-foreground" title={file.name}>
+                      <span className="min-w-0 flex-1 truncate text-muted-foreground" title={file.name}>
                         {file.name}
                       </span>
-                      <span className="font-mono text-muted-foreground ml-2">
+                      <span className="ml-2 flex-shrink-0 font-mono text-muted-foreground">
                         {formatBytes(file.size)}
                       </span>
                     </div>
@@ -288,7 +305,7 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
           )}
 
           {/* Connected Peers Section */}
-          <div>
+          <div className={cn(!isCompact && 'min-h-0 flex flex-1 flex-col')}>
             <div className={cn(
               'flex items-center gap-1.5 font-medium text-foreground mb-1.5',
               isCompact ? 'text-xs' : 'text-sm'
@@ -300,7 +317,7 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
               </Badge>
             </div>
             {torrent.connectedPeers.length > 0 ? (
-              <div className={cn('overflow-y-auto scrollbar-thin', isCompact ? 'max-h-24 space-y-0.5' : 'max-h-40 space-y-1')}>
+              <div className={cn('min-h-0 overflow-y-auto scrollbar-thin', isCompact ? 'max-h-24 space-y-0.5' : 'flex-1 space-y-1')}>
                 {torrent.connectedPeers.map((peer) => (
                   <div
                     key={peer.id}
@@ -337,14 +354,15 @@ export function DetailsPanel({ torrent, onClose, isCompact = false }: DetailsPan
             ) : (
               <div className={cn(
                 'text-muted-foreground text-center',
-                isCompact ? 'text-[10px] py-2' : 'text-xs py-4'
+                isCompact ? 'text-[10px] py-2' : 'flex flex-1 items-center justify-center text-xs'
               )}>
                 —
               </div>
             )}
           </div>
+          </div>
         </div>
-      </ScrollArea>
+      </ContentWrapper>
     </div>
   );
 }

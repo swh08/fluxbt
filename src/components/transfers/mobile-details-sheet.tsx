@@ -15,6 +15,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { useBackground } from '@/contexts/background-context';
+import { getPreferredTracker, getTrackerHostLabel } from '@/lib/trackers';
+import { getCategoryBadgeLabel } from '@/components/transfers/category-badge';
 import {
   ArrowDown,
   ArrowUp,
@@ -45,6 +47,9 @@ export function MobileDetailsSheet({ torrent, isOpen, onOpenChange }: MobileDeta
 
   if (!torrent) return null;
 
+  const preferredTracker = getPreferredTracker(torrent.trackers);
+  const categoryBadgeLabel = getCategoryBadgeLabel(torrent.category);
+
   const statusColors: Record<string, string> = {
     downloading: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
     seeding: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
@@ -72,19 +77,21 @@ export function MobileDetailsSheet({ torrent, isOpen, onOpenChange }: MobileDeta
             <Badge variant="outline" className={cn('text-xs', statusColors[torrent.status])}>
               {t(`status.${torrent.status}`)}
             </Badge>
-            {torrent.trackers[0] && (
-              <Badge variant="outline" className="text-xs font-mono">
-                {torrent.trackers[0].replace(/^https?:\/\/|\/.*$/g, '').split('.')[0]}
-              </Badge>
+            {preferredTracker && (
+              <span className="px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 text-[10px] font-mono">
+                {getTrackerHostLabel(preferredTracker)}
+              </span>
             )}
             {torrent.tags.map((tag) => (
               <Badge key={tag} variant="secondary" className="text-xs">
                 {tag}
               </Badge>
             ))}
-            <Badge variant="secondary" className="text-xs">
-              {torrent.type}
-            </Badge>
+            {categoryBadgeLabel && (
+              <Badge variant="secondary" className="text-xs">
+                {categoryBadgeLabel}
+              </Badge>
+            )}
           </div>
         </SheetHeader>
 
