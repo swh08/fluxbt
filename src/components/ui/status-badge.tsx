@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { TorrentStatus } from '@/lib/types';
-import { getStatusBgColor } from '@/lib/mock-data';
+import { getStatusBgColor } from '@/lib/torrent-status';
 import { useI18n } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
 

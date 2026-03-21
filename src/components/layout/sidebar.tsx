@@ -30,13 +30,13 @@ import {
   Plus,
   Pencil,
 } from 'lucide-react';
-import { StatusFilter, TorrentStatus, Torrent } from '@/lib/types';
-import { mockServers, ServerStats } from '@/lib/mock-data';
-import { useState, useEffect } from 'react';
+import { StatusFilter, TorrentStatus, Torrent, ServerStats } from '@/lib/types';
+import { useState } from 'react';
 import { ServerDialog, ServerConfig } from '@/components/servers/server-dialog';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface SidebarProps {
+  servers: ServerStats[];
   torrents: Torrent[];
   activeFilter: StatusFilter | null;
   onFilterChange: (filter: StatusFilter) => void;
@@ -44,6 +44,8 @@ interface SidebarProps {
   isDashboard: boolean;
   selectedServerId?: string;
   onServerChange?: (serverId: string) => void;
+  onSaveServer?: (server: ServerConfig) => Promise<void> | void;
+  onDeleteServer?: (serverId: string) => Promise<void> | void;
   // Mobile sheet state
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -69,6 +71,7 @@ const statusColors: Record<TorrentStatus, string> = {
 };
 
 function SidebarContent({
+  servers,
   torrents,
   activeFilter,
   onFilterChange,
@@ -76,6 +79,8 @@ function SidebarContent({
   isDashboard,
   selectedServerId,
   onServerChange,
+  onSaveServer,
+  onDeleteServer,
   isCollapsed = false,
   onCollapsedChange,
   onOpenChange,
@@ -99,9 +104,10 @@ function SidebarContent({
     return torrents.filter((t) => t.status === status).length;
   };
 
-  const selectedServer: ServerStats = mockServers.find(s => s.id === selectedServerId) 
-    || mockServers.find(s => s.status === 'online') 
-    || mockServers[0];
+  const selectedServer = servers.find((server) => server.id === selectedServerId)
+    ?? servers.find((server) => server.status === 'online')
+    ?? servers[0]
+    ?? null;
 
   const handleServerSelect = (serverId: string) => {
     onServerChange?.(serverId);
@@ -118,26 +124,24 @@ function SidebarContent({
     setEditingServer({
       id: server.id,
       name: server.name,
-      type: server.port === 9091 ? 'transmission' : 'qbittorrent',
-      host: server.ip,
+      type: server.type,
+      host: server.host,
       port: server.port,
-      username: '',
+      username: server.username,
       password: '',
     });
     setServerDialogOpen(true);
     setServerDropdownOpen(false);
   };
 
-  const handleSaveServer = (server: ServerConfig) => {
-    // In a real app, this would save to backend
-    console.log('Save server:', server);
+  const handleSaveServer = async (server: ServerConfig) => {
+    await onSaveServer?.(server);
     setServerDialogOpen(false);
     setEditingServer(null);
   };
 
-  const handleDeleteServer = (serverId: string) => {
-    // In a real app, this would delete from backend
-    console.log('Delete server:', serverId);
+  const handleDeleteServer = async (serverId: string) => {
+    await onDeleteServer?.(serverId);
     setServerDialogOpen(false);
     setEditingServer(null);
   };
@@ -205,34 +209,49 @@ function SidebarContent({
           'mx-3 mt-3 transition-opacity duration-200',
           isCollapsed ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'
         )}>
-          <button
-            onClick={() => setServerDropdownOpen(!serverDropdownOpen)}
-            className={cn(
-              'w-full px-3 py-2 rounded-lg border-2 text-left',
-              'transition-colors',
-              backgroundImage
-                ? 'bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55'
-                : 'bg-card',
-              selectedServer.status === 'online' ? 'border-emerald-500/50' : 'border-red-500/50',
-              'hover:border-primary/50'
-            )}
-          >
-            <div className="flex items-center gap-2 mb-1">
-              <Server className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-card-foreground truncate">
-                {selectedServer.name}
-              </span>
-              <ChevronDown className={cn(
-                'w-4 h-4 text-muted-foreground ml-auto transition-transform flex-shrink-0',
-                serverDropdownOpen && 'rotate-180'
-              )} />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground font-mono truncate">
-                {selectedServer.ip}:{selectedServer.port}
-              </span>
-            </div>
-          </button>
+          {selectedServer ? (
+            <button
+              onClick={() => setServerDropdownOpen(!serverDropdownOpen)}
+              className={cn(
+                'w-full px-3 py-2 rounded-lg border-2 text-left',
+                'transition-colors',
+                backgroundImage
+                  ? 'bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55'
+                  : 'bg-card',
+                selectedServer.status === 'online' ? 'border-emerald-500/50' : 'border-red-500/50',
+                'hover:border-primary/50'
+              )}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <Server className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-card-foreground truncate">
+                  {selectedServer.name}
+                </span>
+                <ChevronDown className={cn(
+                  'w-4 h-4 text-muted-foreground ml-auto transition-transform flex-shrink-0',
+                  serverDropdownOpen && 'rotate-180'
+                )} />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground font-mono truncate">
+                  {selectedServer.host}:{selectedServer.port}
+                </span>
+              </div>
+            </button>
+          ) : (
+            <button
+              onClick={handleAddServer}
+              className={cn(
+                'w-full px-3 py-3 rounded-lg border-2 text-left text-sm font-medium text-card-foreground',
+                backgroundImage
+                  ? 'bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55'
+                  : 'bg-card',
+                'border-dashed border-primary/40 hover:border-primary/60 transition-colors',
+              )}
+            >
+              {t('serverDialog.addServer')}
+            </button>
+          )}
 
           {/* Server Dropdown */}
           <AnimatePresence>
@@ -253,12 +272,12 @@ function SidebarContent({
                       : 'bg-card',
                   )}
                 >
-                  {mockServers.map((server) => (
+                  {servers.map((server) => (
                     <div
                       key={server.id}
                       className={cn(
                         'flex items-center text-xs hover:bg-accent transition-colors',
-                        server.id === selectedServer.id && 'bg-accent/50'
+                        server.id === selectedServer?.id && 'bg-accent/50'
                       )}
                     >
                       <button
@@ -300,7 +319,7 @@ function SidebarContent({
         </div>
 
         {/* Server indicator when collapsed */}
-        {isCollapsed && (
+        {isCollapsed && selectedServer && (
           <div className="p-2 flex justify-center">
             <div className={cn(
               'w-8 h-8 rounded-lg flex items-center justify-center',
@@ -403,7 +422,7 @@ function SidebarContent({
         <div className={cn('p-3 border-t', sidebarBorderClass)}>
           {!isCollapsed ? (
             <p className="text-xs text-muted-foreground text-center">
-              v{selectedServer.version}
+              {selectedServer ? `v${selectedServer.version}` : t('server.connecting')}
             </p>
           ) : (
             <Button
@@ -481,6 +500,7 @@ export function DesktopSidebar({
 
 // Main Sidebar export with responsive behavior
 export function Sidebar({
+  servers,
   torrents,
   activeFilter,
   onFilterChange,
@@ -498,6 +518,7 @@ export function Sidebar({
 }) {
   return (
     <SidebarContent
+      servers={servers}
       torrents={torrents}
       activeFilter={activeFilter}
       onFilterChange={onFilterChange}

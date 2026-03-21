@@ -14,12 +14,19 @@ interface TransferListProps {
   selectedId: string | null;
   onSelect: (id: string) => void;
   isMobile?: boolean;
+  onAction?: (torrent: Torrent, action: 'pause' | 'resume' | 'delete') => void;
 }
 
 export type SortField = 'name' | 'progress' | 'downloadSpeed' | 'uploadSpeed' | 'eta' | 'seeds' | 'peers' | 'size' | 'addedAt';
 export type SortDirection = 'asc' | 'desc';
 
-export function TransferList({ torrents, selectedId, onSelect, isMobile = false }: TransferListProps) {
+export function TransferList({
+  torrents,
+  selectedId,
+  onSelect,
+  isMobile = false,
+  onAction,
+}: TransferListProps) {
   const { t } = useI18n();
   const [sortField, setSortField] = useState<SortField>('addedAt');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -41,7 +48,7 @@ export function TransferList({ torrents, selectedId, onSelect, isMobile = false 
           break;
         case 'downloadSpeed':
           aVal = a.downloadSpeed;
-          bVal = b.uploadSpeed;
+          bVal = b.downloadSpeed;
           break;
         case 'uploadSpeed':
           aVal = a.uploadSpeed;
@@ -283,6 +290,7 @@ export function TransferList({ torrents, selectedId, onSelect, isMobile = false 
                 torrent={torrent}
                 isSelected={selectedId === torrent.id}
                 onClick={() => onSelect(torrent.id)}
+                onAction={onAction}
               />
             </motion.div>
           ))}

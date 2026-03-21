@@ -5,20 +5,14 @@ import { Topbar } from '@/components/layout/topbar';
 import { TransferList } from '@/components/transfers/transfer-list';
 import { DetailsPanel } from '@/components/transfers/details-panel';
 import { MobileDetailsSheet } from '@/components/transfers/mobile-details-sheet';
-import {
-  mockTorrents,
-  mockCategories,
-  mockTags,
-  filterByStatus,
-  filterByServer,
-  searchTorrents,
-} from '@/lib/mock-data';
-import { StatusFilter } from '@/lib/types';
-import { useState, useMemo } from 'react';
+import type { AddTorrentSubmission } from '@/components/transfers/add-torrent-dialog';
+import { StatusFilter, type Category, type Tag, type Torrent } from '@/lib/types';
+import { useState, useMemo, useEffect } from 'react';
 import { useI18n } from '@/contexts/i18n-context';
 import { useBackground } from '@/contexts/background-context';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { SessionUserIdentity } from '@/lib/auth/session-user';
+import { hydrateTorrentDetails } from '@/lib/client-data';
 
 interface TransfersPageProps {
   selectedServerId: string;
@@ -27,88 +21,204 @@ interface TransfersPageProps {
   isMobile?: boolean;
   isTablet?: boolean;
   currentUser?: SessionUserIdentity;
+  timezone: string;
+  onTimezoneChange?: (timezone: string) => Promise<void>;
+  torrents: Torrent[];
+  categories: Category[];
+  tags: Tag[];
+  onRefresh: (preferredServerId?: string | null) => Promise<unknown>;
 }
 
-export function TransfersPage({ 
-  selectedServerId, 
-  activeFilter, 
+function matchesStatus(torrent: Torrent, filter: StatusFilter) {
+  if (filter === 'all') {
+    return true;
+  }
+
+  return torrent.status === filter;
+}
+
+function matchesSearch(torrent: Torrent, query: string) {
+  if (!query.trim()) {
+    return true;
+  }
+
+  const normalizedQuery = query.trim().toLowerCase();
+  return (
+    torrent.name.toLowerCase().includes(normalizedQuery)
+    || torrent.trackers.some((tracker) => tracker.toLowerCase().includes(normalizedQuery))
+    || torrent.tags.some((tag) => tag.toLowerCase().includes(normalizedQuery))
+  );
+}
+
+export function TransfersPage({
+  selectedServerId,
+  activeFilter,
   onFilterChange,
   isMobile = false,
   isTablet = false,
   currentUser,
+  timezone,
+  onTimezoneChange,
+  torrents,
+  categories,
+  tags,
+  onRefresh,
 }: TransfersPageProps) {
   const { t } = useI18n();
   const { backgroundImage } = useBackground();
-  
-  // State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTag, setSelectedTag] = useState('all');
   const [selectedTorrentId, setSelectedTorrentId] = useState<string | null>(null);
-  
-  // Mobile details sheet state
+  const [selectedTorrentDetails, setSelectedTorrentDetails] = useState<Torrent | null>(null);
   const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
 
-  // Filter torrents by server first
-  const serverTorrents = useMemo(() => {
-    return filterByServer(mockTorrents, selectedServerId);
+  useEffect(() => {
+    setSelectedTorrentId(null);
+    setSelectedTorrentDetails(null);
+    setDetailsSheetOpen(false);
   }, [selectedServerId]);
 
-  // Filter torrents by status and other criteria
   const filteredTorrents = useMemo(() => {
-    let result = serverTorrents;
+    return torrents
+      .filter((torrent) => matchesStatus(torrent, activeFilter))
+      .filter((torrent) => matchesSearch(torrent, searchQuery))
+      .filter((torrent) => (
+        selectedCategory === 'all'
+          ? true
+          : selectedCategory === '__none__'
+            ? !torrent.category
+            : torrent.category === selectedCategory
+      ))
+      .filter((torrent) => (selectedTag === 'all' ? true : torrent.tags.includes(selectedTag)));
+  }, [activeFilter, searchQuery, selectedCategory, selectedTag, torrents]);
 
-    // Filter by status
-    result = filterByStatus(result, activeFilter);
-
-    // Filter by search query
-    result = searchTorrents(result, searchQuery);
-
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      result = result.filter((t) => t.category === selectedCategory);
+  const baseSelectedTorrent = useMemo(() => {
+    if (!selectedTorrentId) {
+      return null;
     }
 
-    // Filter by tag
-    if (selectedTag !== 'all') {
-      result = result.filter((t) => t.tags.includes(selectedTag));
+    return torrents.find((torrent) => torrent.id === selectedTorrentId) ?? null;
+  }, [selectedTorrentId, torrents]);
+
+  useEffect(() => {
+    if (!selectedTorrentId || !selectedServerId) {
+      setSelectedTorrentDetails(null);
+      return;
     }
 
-    return result;
-  }, [serverTorrents, activeFilter, searchQuery, selectedCategory, selectedTag]);
+    let cancelled = false;
 
-  // Get selected torrent - only return if explicitly selected
-  const selectedTorrent = useMemo(() => {
-    if (!selectedTorrentId) return null;
-    return serverTorrents.find((t) => t.id === selectedTorrentId) || null;
-  }, [selectedTorrentId, serverTorrents]);
+    const loadTorrentDetails = async () => {
+      const response = await fetch(`/api/servers/${selectedServerId}/torrents/${selectedTorrentId}`, {
+        cache: 'no-store',
+      });
 
-  // Calculate total speeds for selected server
-  const totalDownloadSpeed = useMemo(() => {
-    return serverTorrents.reduce((sum, t) => sum + t.downloadSpeed, 0);
-  }, [serverTorrents]);
+      if (!response.ok) {
+        return;
+      }
 
-  const totalUploadSpeed = useMemo(() => {
-    return serverTorrents.reduce((sum, t) => sum + t.uploadSpeed, 0);
-  }, [serverTorrents]);
+      const torrent = hydrateTorrentDetails((await response.json()) as Torrent);
 
-  // Handle torrent selection - on mobile, open details sheet
+      if (!cancelled) {
+        setSelectedTorrentDetails(torrent);
+      }
+    };
+
+    void loadTorrentDetails();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedServerId, selectedTorrentId]);
+
+  const selectedTorrent = selectedTorrentDetails?.id === selectedTorrentId
+    ? selectedTorrentDetails
+    : baseSelectedTorrent;
+
   const handleSelect = (id: string) => {
     setSelectedTorrentId(id);
+    setSelectedTorrentDetails(null);
+
     if (isMobile) {
       setDetailsSheetOpen(true);
     }
   };
 
+  const handleTorrentAction = async (torrent: Torrent, action: 'pause' | 'resume' | 'delete') => {
+    if (!selectedServerId) {
+      return;
+    }
+
+    const endpoint =
+      action === 'delete'
+        ? `/api/servers/${selectedServerId}/torrents/${torrent.id}/delete`
+        : `/api/servers/${selectedServerId}/torrents/${torrent.id}/${action}`;
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: action === 'delete'
+        ? { 'Content-Type': 'application/json' }
+        : undefined,
+      body: action === 'delete' ? JSON.stringify({ deleteFiles: false }) : undefined,
+    });
+
+    if (!response.ok) {
+      console.error('Failed to perform torrent action.');
+      return;
+    }
+
+    if (action === 'delete' && selectedTorrentId === torrent.id) {
+      setSelectedTorrentId(null);
+      setSelectedTorrentDetails(null);
+    }
+
+    await onRefresh(selectedServerId);
+  };
+
+  const handleAddTorrent = async (input: AddTorrentSubmission) => {
+    if (!selectedServerId) {
+      return;
+    }
+
+    const formData = new FormData();
+
+    if (input.magnetLink.trim()) {
+      formData.append('urls', input.magnetLink.trim());
+    }
+
+    if (input.torrentFile) {
+      formData.append('torrentFile', input.torrentFile, input.torrentFile.name);
+    }
+
+    formData.append('savePath', input.savePath);
+    formData.append('category', input.category);
+    formData.append('startImmediately', String(input.startImmediately));
+
+    for (const tag of input.tags) {
+      formData.append('tags', tag);
+    }
+
+    const response = await fetch(`/api/servers/${selectedServerId}/torrents/add`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      console.error('Failed to add torrent.');
+      return;
+    }
+
+    await onRefresh(selectedServerId);
+  };
+
   return (
-    <div className="flex-1 flex flex-col min-h-0">
-      {/* Top Bar - Hidden on mobile */}
+    <div className="flex min-h-0 flex-1 flex-col">
       {!isMobile && (
         <Topbar
           title={t('transfers.title')}
           totalCount={filteredTorrents.length}
-          downloadSpeed={totalDownloadSpeed}
-          uploadSpeed={totalUploadSpeed}
+          downloadSpeed={torrents.reduce((sum, torrent) => sum + torrent.downloadSpeed, 0)}
+          uploadSpeed={torrents.reduce((sum, torrent) => sum + torrent.uploadSpeed, 0)}
           showFilters={true}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -116,25 +226,32 @@ export function TransfersPage({
           onCategoryChange={setSelectedCategory}
           selectedTag={selectedTag}
           onTagChange={setSelectedTag}
-          categories={mockCategories}
-          tags={mockTags}
+          categories={categories}
+          tags={tags}
           activeFilter={activeFilter}
           onFilterChange={onFilterChange}
           currentUser={currentUser}
+          timezone={timezone}
+          onTimezoneChange={onTimezoneChange}
+          addTorrentCategories={categories.filter((category) => category.id !== '__none__')}
+          addTorrentTags={tags}
+          onAddTorrent={handleAddTorrent}
         />
       )}
 
-      {/* Content Area with Details Panel */}
-      <div className="flex-1 flex min-h-0 relative" onClick={(e) => {
-        // Deselect when clicking on empty area (not on torrent rows or details panel)
-        const target = e.target as HTMLElement;
-        const isClickOnTorrent = target.closest('[data-torrent-row]');
-        const isClickOnDetails = target.closest('[data-details-panel]');
-        if (!isClickOnTorrent && !isClickOnDetails && selectedTorrentId) {
-          setSelectedTorrentId(null);
-        }
-      }}>
-        {/* Transfer List */}
+      <div
+        className="relative flex min-h-0 flex-1"
+        onClick={(event) => {
+          const target = event.target as HTMLElement;
+          const isClickOnTorrent = target.closest('[data-torrent-row]');
+          const isClickOnDetails = target.closest('[data-details-panel]');
+
+          if (!isClickOnTorrent && !isClickOnDetails && selectedTorrentId) {
+            setSelectedTorrentId(null);
+            setSelectedTorrentDetails(null);
+          }
+        }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={activeFilter}
@@ -142,21 +259,18 @@ export function TransfersPage({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15, ease: 'easeInOut' }}
-            className={cn(
-              'flex-1 min-w-0',
-              backgroundImage ? 'bg-transparent' : 'bg-background',
-            )}
+            className={cn('min-w-0 flex-1', backgroundImage ? 'bg-transparent' : 'bg-background')}
           >
             <TransferList
               torrents={filteredTorrents}
               selectedId={selectedTorrentId}
               onSelect={handleSelect}
               isMobile={isMobile}
+              onAction={handleTorrentAction}
             />
           </motion.div>
         </AnimatePresence>
 
-        {/* Details Panel - Hidden on mobile, only shown when torrent selected */}
         <AnimatePresence>
           {!isMobile && selectedTorrent && (
             <motion.div
@@ -167,24 +281,26 @@ export function TransfersPage({
               exit={{ x: '100%', opacity: 0 }}
               transition={{ duration: 0.25, ease: 'easeInOut' }}
               className={cn(
-                'absolute right-0 top-0 bottom-0 z-10',
+                'absolute bottom-0 right-0 top-0 z-10',
                 backgroundImage
                   ? 'border-l border-white/10 bg-card/75 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60'
                   : 'border-l border-border bg-card',
-                isTablet ? 'w-72' : 'w-80 lg:w-96'
+                isTablet ? 'w-72' : 'w-80 lg:w-96',
               )}
             >
-              <DetailsPanel 
-                torrent={selectedTorrent} 
+              <DetailsPanel
+                torrent={selectedTorrent}
                 isCompact={isTablet}
-                onClose={() => setSelectedTorrentId(null)}
+                onClose={() => {
+                  setSelectedTorrentId(null);
+                  setSelectedTorrentDetails(null);
+                }}
               />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Mobile Details Sheet */}
       {isMobile && (
         <MobileDetailsSheet
           torrent={selectedTorrent}

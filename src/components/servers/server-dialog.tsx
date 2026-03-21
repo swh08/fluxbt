@@ -61,7 +61,7 @@ export function ServerDialog({ open, onOpenChange, server, onSave, onDelete }: S
       setFormData(server);
     } else {
       setFormData({
-        id: `server-${Date.now()}`,
+        id: '',
         name: '',
         type: 'qbittorrent',
         host: '',

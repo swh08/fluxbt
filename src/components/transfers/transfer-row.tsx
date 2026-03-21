@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
 import { Torrent } from '@/lib/types';
-import { formatBytes, formatSpeedShort, formatETA } from '@/lib/mock-data';
+import { formatBytes, formatSpeedShort, formatETA } from '@/lib/formatters';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ interface TransferRowProps {
   torrent: Torrent;
   isSelected: boolean;
   onClick: () => void;
+  onAction?: (torrent: Torrent, action: 'pause' | 'resume' | 'delete') => void;
 }
 
 // Mobile Card Row
@@ -131,12 +132,12 @@ export function MobileTransferRow({ torrent, isSelected, onClick }: TransferRowP
 }
 
 // Desktop/Tablet Row
-export function TransferRow({ torrent, isSelected, onClick }: TransferRowProps) {
+export function TransferRow({ torrent, isSelected, onClick, onAction }: TransferRowProps) {
   const { t } = useI18n();
 
-  const handleActionClick = (e: React.MouseEvent, action: string) => {
+  const handleActionClick = (e: React.MouseEvent, action: 'pause' | 'resume' | 'delete') => {
     e.stopPropagation();
-    console.log(`Action ${action} for torrent ${torrent.id}`);
+    onAction?.(torrent, action);
   };
 
   return (

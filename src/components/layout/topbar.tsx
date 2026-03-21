@@ -21,10 +21,10 @@ import {
   Menu,
   ChevronDown,
 } from 'lucide-react';
-import { formatSpeed } from '@/lib/mock-data';
+import { formatSpeed } from '@/lib/formatters';
 import { SettingsMenu } from '@/components/settings/settings-menu';
-import { StatusFilter } from '@/lib/types';
-import { AddTorrentDialog } from '@/components/transfers/add-torrent-dialog';
+import { StatusFilter, type Category, type Tag } from '@/lib/types';
+import { AddTorrentDialog, type AddTorrentSubmission } from '@/components/transfers/add-torrent-dialog';
 import { useBackground } from '@/contexts/background-context';
 import {
   getSessionUserDisplayName,
@@ -40,6 +40,11 @@ interface MobileTopbarProps {
   uploadSpeed: number;
   showAddButton?: boolean;
   currentUser?: SessionUserIdentity;
+  timezone: string;
+  onTimezoneChange?: (timezone: string) => Promise<void>;
+  addTorrentCategories?: Category[];
+  addTorrentTags?: Tag[];
+  onAddTorrent?: (input: AddTorrentSubmission) => Promise<void>;
 }
 
 export function MobileTopbar({
@@ -49,6 +54,11 @@ export function MobileTopbar({
   uploadSpeed,
   showAddButton = true,
   currentUser,
+  timezone,
+  onTimezoneChange,
+  addTorrentCategories = [],
+  addTorrentTags = [],
+  onAddTorrent,
 }: MobileTopbarProps) {
   const { t } = useI18n();
   const { backgroundImage } = useBackground();
@@ -93,7 +103,7 @@ export function MobileTopbar({
               <Plus className="w-4 h-4" />
             </Button>
           )}
-          <SettingsMenu user={currentUser}>
+          <SettingsMenu user={currentUser} timezone={timezone} onTimezoneChange={onTimezoneChange}>
             <Button
               variant="ghost"
               size="icon"
@@ -114,7 +124,13 @@ export function MobileTopbar({
       </header>
 
       {/* Add Torrent Dialog */}
-      <AddTorrentDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
+      <AddTorrentDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+        categories={addTorrentCategories}
+        tags={addTorrentTags}
+        onSubmit={onAddTorrent ?? (async () => {})}
+      />
     </>
   );
 }
@@ -148,6 +164,11 @@ interface TopbarProps {
   // Actions
   showAddButton?: boolean;
   currentUser?: SessionUserIdentity;
+  timezone: string;
+  onTimezoneChange?: (timezone: string) => Promise<void>;
+  addTorrentCategories?: Category[];
+  addTorrentTags?: Tag[];
+  onAddTorrent?: (input: AddTorrentSubmission) => Promise<void>;
 }
 
 export function Topbar({
@@ -169,6 +190,11 @@ export function Topbar({
   onFilterChange,
   showAddButton = true,
   currentUser,
+  timezone,
+  onTimezoneChange,
+  addTorrentCategories = [],
+  addTorrentTags = [],
+  onAddTorrent,
 }: TopbarProps) {
   const { t } = useI18n();
   const { backgroundImage } = useBackground();
@@ -231,7 +257,7 @@ export function Topbar({
               <SelectItem value="all">{t('transfers.allCategories')}</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat.id} value={cat.id}>
-                  {cat.name}
+                  {cat.id === '__none__' ? t('addTorrent.noCategory') : cat.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -306,7 +332,7 @@ export function Topbar({
         )}
 
         {/* Settings Menu */}
-        <SettingsMenu user={currentUser}>
+        <SettingsMenu user={currentUser} timezone={timezone} onTimezoneChange={onTimezoneChange}>
           <Button
             variant="ghost"
             className={cn(
@@ -332,7 +358,13 @@ export function Topbar({
     </header>
 
     {/* Add Torrent Dialog */}
-    <AddTorrentDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
+      <AddTorrentDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+        categories={addTorrentCategories}
+        tags={addTorrentTags}
+        onSubmit={onAddTorrent ?? (async () => {})}
+      />
     </>
   );
 }

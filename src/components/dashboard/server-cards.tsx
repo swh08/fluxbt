@@ -3,8 +3,8 @@
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
 import { useBackground } from '@/contexts/background-context';
-import { ServerStats } from '@/lib/mock-data';
-import { formatBytes, formatSpeed } from '@/lib/mock-data';
+import { ServerStats } from '@/lib/types';
+import { formatBytes, formatSpeed } from '@/lib/formatters';
 import { ArrowDown, ArrowUp, Server } from 'lucide-react';
 import { Sparkline } from '@/components/ui/sparkline';
 
@@ -70,7 +70,7 @@ function ServerCard({ server, isSelected, onClick, isMobile, hasBackground = fal
               'text-muted-foreground font-mono truncate',
               isMobile ? 'text-[10px]' : 'text-xs'
             )}>
-              {server.ip}:{server.port}
+              {server.host}:{server.port}
             </p>
           </div>
         </div>

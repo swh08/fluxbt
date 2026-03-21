@@ -49,6 +49,14 @@
     "allTimeDownloaded": "All-time Downloaded",
     "allTimeUploaded": "All-time Uploaded",
     "serverOverview": "Server Overview",
+    "todayUploadOverview": "Today's Upload Overview",
+    "todayCountryUpload": "Today's Upload by Country",
+    "todayTrackerUpload": "Today's Upload by Tracker",
+    "todayUploaded": "Today's Uploaded",
+    "sampledEstimate": "Estimated from active peer samples",
+    "lastSampled": "Last sampled",
+    "storageDistribution": "Storage Distribution",
+    "totalStoredSize": "Total Stored Size",
     "currentSpeed": "Current Speed",
     "downloaded": "Downloaded",
     "uploaded": "Uploaded",
@@ -142,7 +150,8 @@
     "uploadBackground": "Upload Background",
     "clearBackground": "Clear Background",
     "blur": "Blur",
-    "opacity": "Opacity"
+    "opacity": "Opacity",
+    "timezone": "Timezone"
   },
   "auth": {
     "username": "Username",

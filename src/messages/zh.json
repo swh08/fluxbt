@@ -49,6 +49,14 @@
     "allTimeDownloaded": "累计下载",
     "allTimeUploaded": "累计上传",
     "serverOverview": "服务器概览",
+    "todayUploadOverview": "今日上传概览",
+    "todayCountryUpload": "今日上传国家分布",
+    "todayTrackerUpload": "今日上传 Tracker 分布",
+    "todayUploaded": "今日已上传",
+    "sampledEstimate": "基于在线 Peer 采样估算",
+    "lastSampled": "最后采样",
+    "storageDistribution": "存储分布",
+    "totalStoredSize": "总存储大小",
     "currentSpeed": "当前速度",
     "downloaded": "已下载",
     "uploaded": "已上传",
@@ -142,7 +150,8 @@
     "uploadBackground": "上传背景图片",
     "clearBackground": "清除背景",
     "blur": "模糊度",
-    "opacity": "透明度"
+    "opacity": "透明度",
+    "timezone": "时区"
   },
   "auth": {
     "username": "用户名",

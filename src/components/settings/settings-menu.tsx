@@ -15,25 +15,37 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Check, Sun, Moon, Monitor, Languages, Image as ImageIcon, X, Upload, LogOut } from 'lucide-react';
+import { Check, Sun, Moon, Monitor, Languages, Clock3, Image as ImageIcon, X, Upload, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   getSessionUserDisplayName,
   getSessionUserInitial,
   type SessionUserIdentity,
 } from '@/lib/auth/session-user';
+import { TIMEZONE_OPTIONS } from '@/lib/timezones';
 
 interface SettingsMenuProps {
   children: React.ReactNode;
   user?: SessionUserIdentity;
+  timezone: string;
+  onTimezoneChange?: (timezone: string) => Promise<void>;
 }
 
-export function SettingsMenu({ children, user }: SettingsMenuProps) {
+export function SettingsMenu({ children, user, timezone, onTimezoneChange }: SettingsMenuProps) {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useI18n();
   const { backgroundImage, backgroundBlur, backgroundOpacity, setBackground, setBlur, setOpacity, clearBackground } = useBackground();
   const [mounted, setMounted] = React.useState(false);
+  const [pendingTimezone, setPendingTimezone] = React.useState(timezone);
+  const [isSavingTimezone, setIsSavingTimezone] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const displayName = getSessionUserDisplayName(user ?? {});
   const userInitial = getSessionUserInitial(user ?? {});
@@ -41,6 +53,10 @@ export function SettingsMenu({ children, user }: SettingsMenuProps) {
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  React.useEffect(() => {
+    setPendingTimezone(timezone);
+  }, [timezone]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -69,6 +85,36 @@ export function SettingsMenu({ children, user }: SettingsMenuProps) {
         : new URL('/login', window.location.origin).toString();
 
     void signOut({ callbackUrl });
+  };
+
+  const timezoneOptions = React.useMemo(() => {
+    if (!pendingTimezone || TIMEZONE_OPTIONS.some((option) => option.value === pendingTimezone)) {
+      return TIMEZONE_OPTIONS;
+    }
+
+    return [
+      { value: pendingTimezone, label: pendingTimezone.replace(/_/g, ' ') },
+      ...TIMEZONE_OPTIONS,
+    ];
+  }, [pendingTimezone]);
+
+  const handleTimezoneValueChange = async (nextTimezone: string) => {
+    setPendingTimezone(nextTimezone);
+
+    if (!onTimezoneChange || nextTimezone === timezone) {
+      return;
+    }
+
+    setIsSavingTimezone(true);
+
+    try {
+      await onTimezoneChange(nextTimezone);
+    } catch (error) {
+      console.error('Failed to update timezone.', error);
+      setPendingTimezone(timezone);
+    } finally {
+      setIsSavingTimezone(false);
+    }
   };
 
   if (!mounted) {
@@ -270,6 +316,41 @@ export function SettingsMenu({ children, user }: SettingsMenuProps) {
               {language === 'en' && <Check className="w-4 h-4 text-primary" />}
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
+
+          <DropdownMenuSeparator className="my-2" />
+
+          <DropdownMenuLabel className="flex items-center gap-2 px-2 pt-1 pb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <Clock3 className="h-3.5 w-3.5" />
+            {t('settings.timezone')}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator className="my-1" />
+          <div className="px-2 pb-1">
+            <Select
+              value={pendingTimezone}
+              onValueChange={(value) => {
+                void handleTimezoneValueChange(value);
+              }}
+              disabled={isSavingTimezone}
+            >
+              <SelectTrigger
+                className={cn(
+                  'h-8 w-full text-sm',
+                  backgroundImage
+                    ? 'border-white/15 bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45'
+                    : 'bg-background',
+                )}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {timezoneOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           <DropdownMenuSeparator className="my-2" />
 

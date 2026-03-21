@@ -3,8 +3,8 @@
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
 import { useBackground } from '@/contexts/background-context';
-import { formatBytes, formatSpeed } from '@/lib/mock-data';
-import { DashboardStats } from '@/lib/mock-data';
+import { formatBytes, formatSpeed } from '@/lib/formatters';
+import { DashboardStats } from '@/lib/types';
 import { Server, HardDrive, ArrowDown, ArrowUp } from 'lucide-react';
 import { Sparkline } from '@/components/ui/sparkline';
 

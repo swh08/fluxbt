@@ -18,6 +18,8 @@ model User {
   username     String   @unique
   passwordHash String
   name         String?
+  timezone     String   @default("Australia/Sydney")
+  servers      ServerConnection[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -30,4 +32,40 @@ model Post {
   authorId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ServerConnection {
+  id                   String                    @id @default(cuid())
+  userId               String
+  name                 String
+  type                 String
+  protocol             String                    @default("http")
+  host                 String
+  port                 Int
+  username             String
+  password             String
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+  dailyUploadSnapshots DailyUploadSnapshot[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, protocol, host, port])
+}
+
+model DailyUploadSnapshot {
+  id            String   @id @default(cuid())
+  serverId      String
+  timezone      String   @default("Australia/Sydney")
+  dateKey       String
+  peerStates    String   @default("{}")
+  countryTotals String   @default("{}")
+  countryNames  String   @default("{}")
+  trackerTotals String   @default("{}")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  server ServerConnection @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@unique([serverId, timezone, dateKey])
 }

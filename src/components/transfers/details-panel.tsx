@@ -8,7 +8,7 @@ import {
   formatSpeed,
   formatETA,
   formatDate,
-} from '@/lib/mock-data';
+} from '@/lib/formatters';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { ScrollArea } from '@/components/ui/scroll-area';

@@ -55,6 +55,26 @@ export interface ServerInfo {
   version: string;
 }
 
+export interface ServerStats {
+  id: string;
+  name: string;
+  type: 'qbittorrent' | 'transmission';
+  host: string;
+  port: number;
+  username: string;
+  status: 'online' | 'offline' | 'connecting';
+  version: string;
+  downloadSpeed: number;
+  uploadSpeed: number;
+  totalDownloaded: number;
+  totalUploaded: number;
+  torrentsCount: number;
+  downloadingCount: number;
+  seedingCount: number;
+  downloadSpeedHistory: number[];
+  uploadSpeedHistory: number[];
+}
+
 export interface SpeedStats {
   downloadSpeed: number; // in bytes per second
   uploadSpeed: number; // in bytes per second
@@ -76,4 +96,53 @@ export interface Tag {
   name: string;
   color: string;
   count: number;
+}
+
+export interface DashboardStats {
+  totalServers: number;
+  onlineServers: number;
+  totalTorrents: number;
+  totalDownloadSpeed: number;
+  totalUploadSpeed: number;
+  allTimeDownloaded: number;
+  allTimeUploaded: number;
+  downloadingCount: number;
+  seedingCount: number;
+  downloadSpeedHistory: number[];
+  uploadSpeedHistory: number[];
+}
+
+export interface TrackerShare {
+  id: string;
+  name: string;
+  uploadBytes: number;
+  percentage: number;
+}
+
+export interface CountryUploadShare {
+  id: string;
+  countryCode: string;
+  countryName: string;
+  uploadBytes: number;
+  percentage: number;
+}
+
+export interface DistributionItem {
+  id: string;
+  label: string;
+  size: number;
+  count: number;
+}
+
+export interface AppStateSnapshot {
+  servers: ServerStats[];
+  dashboard: DashboardStats;
+  selectedServerId: string | null;
+  userTimezone: string;
+  todayUploadSampledAt: string | null;
+  categories: Category[];
+  tags: Tag[];
+  torrents: Torrent[];
+  trackerShares: TrackerShare[];
+  countryUploads: CountryUploadShare[];
 }

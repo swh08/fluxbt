@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
 import { Torrent } from '@/lib/types';
-import { formatBytes, formatSpeed, formatETA, formatDate } from '@/lib/mock-data';
+import { formatBytes, formatSpeed, formatETA, formatDate } from '@/lib/formatters';
 import {
   Sheet,
   SheetContent,

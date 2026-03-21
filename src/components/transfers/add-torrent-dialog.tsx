@@ -29,19 +29,37 @@ import {
   Upload,
   FolderOpen,
   FileText,
-  Tag,
+  Tag as TagIcon,
   FolderTree,
   X,
   Plus,
 } from 'lucide-react';
-import { mockCategories, mockTags } from '@/lib/mock-data';
+import type { Category, Tag as TorrentTag } from '@/lib/types';
 
 interface AddTorrentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  categories: Category[];
+  tags: TorrentTag[];
+  onSubmit: (input: AddTorrentSubmission) => Promise<void>;
 }
 
-export function AddTorrentDialog({ open, onOpenChange }: AddTorrentDialogProps) {
+export interface AddTorrentSubmission {
+  magnetLink: string;
+  torrentFile: File | null;
+  savePath: string;
+  category: string;
+  tags: string[];
+  startImmediately: boolean;
+}
+
+export function AddTorrentDialog({
+  open,
+  onOpenChange,
+  categories,
+  tags,
+  onSubmit,
+}: AddTorrentDialogProps) {
   const { t } = useI18n();
   
   // Form state
@@ -72,17 +90,19 @@ export function AddTorrentDialog({ open, onOpenChange }: AddTorrentDialogProps) 
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    
-    // Reset form and close
-    setMagnetLink('');
-    setTorrentFile(null);
-    setSavePath('/downloads');
-    setCategory('none');
-    setSelectedTags([]);
-    onOpenChange(false);
+    try {
+      await onSubmit({
+        magnetLink,
+        torrentFile,
+        savePath,
+        category,
+        tags: selectedTags,
+        startImmediately,
+      });
+      handleClose();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -201,7 +221,7 @@ export function AddTorrentDialog({ open, onOpenChange }: AddTorrentDialogProps) 
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">{t('addTorrent.noCategory')}</SelectItem>
-                {mockCategories.map((cat) => (
+                {categories.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id}>
                     {cat.name}
                   </SelectItem>
@@ -213,7 +233,7 @@ export function AddTorrentDialog({ open, onOpenChange }: AddTorrentDialogProps) 
           {/* Tags */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
-              <Tag className="w-4 h-4" />
+              <TagIcon className="w-4 h-4" />
               {t('addTorrent.tags')}
             </Label>
             
@@ -221,7 +241,7 @@ export function AddTorrentDialog({ open, onOpenChange }: AddTorrentDialogProps) 
             {selectedTags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {selectedTags.map((tagId) => {
-                  const tag = mockTags.find(t => t.id === tagId);
+                  const tag = tags.find(t => t.id === tagId);
                   if (!tag) return null;
                   return (
                     <Badge
@@ -246,7 +266,7 @@ export function AddTorrentDialog({ open, onOpenChange }: AddTorrentDialogProps) 
 
             {/* Available Tags */}
             <div className="flex flex-wrap gap-1.5">
-              {mockTags
+              {tags
                 .filter(tag => !selectedTags.includes(tag.id))
                 .map((tag) => (
                   <Button

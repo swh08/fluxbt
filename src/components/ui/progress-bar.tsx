@@ -2,7 +2,7 @@
 
 import { Progress } from '@/components/ui/progress';
 import { TorrentStatus } from '@/lib/types';
-import { getProgressColor } from '@/lib/mock-data';
+import { getProgressColor } from '@/lib/torrent-status';
 import { cn } from '@/lib/utils';
 
 interface ProgressBarProps {
