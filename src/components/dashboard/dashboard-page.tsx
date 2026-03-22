@@ -22,7 +22,6 @@ interface DashboardPageProps {
   servers: ServerStats[];
   trackerShares: TrackerShare[];
   countryUploads: CountryUploadShare[];
-  todayUploadSampledAt: string | null;
 }
 
 export function DashboardPage({
@@ -37,7 +36,6 @@ export function DashboardPage({
   servers,
   trackerShares,
   countryUploads,
-  todayUploadSampledAt,
 }: DashboardPageProps) {
   const { t } = useI18n();
 
@@ -85,12 +83,7 @@ export function DashboardPage({
               'grid gap-3 sm:gap-4',
               isMobile ? 'grid-cols-1' : 'grid-cols-2'
             )}>
-              <UploadDistributionMap
-                items={countryUploads}
-                isMobile={isMobile}
-                sampledAt={todayUploadSampledAt}
-                timezone={timezone}
-              />
+              <UploadDistributionMap items={countryUploads} isMobile={isMobile} />
               <TrackerPieChart shares={trackerShares} isMobile={isMobile} />
             </div>
           </div>

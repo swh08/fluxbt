@@ -335,7 +335,6 @@ export function HomeShell({ currentUser }: HomeShellProps) {
                 servers={appState.servers}
                 trackerShares={appState.trackerShares}
                 countryUploads={appState.countryUploads}
-                todayUploadSampledAt={appState.todayUploadSampledAt}
               />
             </motion.div>
           ) : (

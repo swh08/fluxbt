@@ -12,8 +12,6 @@ import type { CountryUploadShare } from '@/lib/types';
 interface UploadDistributionMapProps {
   items: CountryUploadShare[];
   isMobile?: boolean;
-  sampledAt?: string | null;
-  timezone: string;
 }
 
 function getFeatureCountryCode(feature: { properties?: Record<string, unknown> }) {
@@ -26,10 +24,8 @@ function getFeatureCountryCode(feature: { properties?: Record<string, unknown> }
 export function UploadDistributionMap({
   items,
   isMobile = false,
-  sampledAt,
-  timezone,
 }: UploadDistributionMapProps) {
-  const { t, language } = useI18n();
+  const { t } = useI18n();
   const { backgroundImage } = useBackground();
   const cardBorderClass = backgroundImage ? 'border-white/15' : 'border-border';
   const dividerBorderClass = backgroundImage ? 'border-white/10' : 'border-border';
@@ -58,15 +54,6 @@ export function UploadDistributionMap({
     const intensity = country.uploadBytes / maxUploaded;
     return `rgba(16, 185, 129, ${0.35 + intensity * 0.65})`;
   };
-
-  const sampledTimeLabel = sampledAt
-    ? new Intl.DateTimeFormat(language === 'zh' ? 'zh-CN' : 'en-US', {
-      timeZone: timezone,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    }).format(new Date(sampledAt))
-    : null;
 
   return (
     <div
@@ -163,11 +150,6 @@ export function UploadDistributionMap({
             <span className="font-mono font-semibold text-emerald-500">{formatBytes(totalUploaded)}</span>
           </div>
 
-          {sampledTimeLabel ? (
-            <p className="mt-2 text-right text-[11px] text-muted-foreground">
-              {t('dashboard.lastSampled')} {sampledTimeLabel}
-            </p>
-          ) : null}
         </>
       )}
     </div>
