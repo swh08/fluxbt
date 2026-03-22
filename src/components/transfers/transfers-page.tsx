@@ -18,6 +18,7 @@ import { mergeSelectedTorrent } from '@/components/transfers/selected-torrent';
 
 interface TransfersPageProps {
   selectedServerId: string;
+  selectedServerType: 'qbittorrent' | 'transmission' | null;
   activeFilter: StatusFilter;
   onFilterChange: (filter: StatusFilter) => void;
   isMobile?: boolean;
@@ -54,6 +55,7 @@ function matchesSearch(torrent: Torrent, query: string) {
 
 export function TransfersPage({
   selectedServerId,
+  selectedServerType,
   activeFilter,
   onFilterChange,
   isMobile = false,
@@ -68,6 +70,7 @@ export function TransfersPage({
 }: TransfersPageProps) {
   const { t } = useI18n();
   const { backgroundImage } = useBackground();
+  const supportsTorrentMetadata = selectedServerType !== 'transmission';
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTag, setSelectedTag] = useState('all');
@@ -249,6 +252,7 @@ export function TransfersPage({
           onTimezoneChange={onTimezoneChange}
           addTorrentCategories={categories.filter((category) => category.id !== '__none__')}
           addTorrentTags={tags}
+          supportsTorrentMetadata={supportsTorrentMetadata}
           onAddTorrent={handleAddTorrent}
         />
       )}

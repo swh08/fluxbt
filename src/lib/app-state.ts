@@ -1,16 +1,11 @@
 import type { ServerConnection } from '@prisma/client';
 import type { AppStateSnapshot, Torrent } from '@/lib/types';
-import { QbittorrentClient } from '@/lib/qbittorrent/client';
 import {
-  buildCategories,
   buildDashboardStats,
   buildOfflineServerStats,
-  buildServerStats,
-  buildTags,
-  mapTorrent,
-  mapTorrentDetails,
 } from '@/lib/qbittorrent/mappers';
 import { buildDailyUploadVisuals } from '@/lib/qbittorrent/daily-upload';
+import { getDownloaderClient } from '@/lib/downloaders';
 import { getServerConnectionById, listServerConnections } from '@/lib/servers/store';
 import { getUserTimezone } from '@/lib/users/store';
 
@@ -23,21 +18,14 @@ interface LiveServerResult {
 }
 
 async function loadServerState(server: ServerConnection): Promise<LiveServerResult> {
-  const client = new QbittorrentClient(server);
-  const [version, mainData] = await Promise.all([
-    client.getVersion(),
-    client.getMainData(),
-  ]);
-  const torrents = Object.entries(mainData.torrents ?? {}).map(([hash, torrent]) =>
-    mapTorrent(server.id, hash, torrent),
-  );
+  const liveState = await getDownloaderClient(server).getLiveState();
 
   return {
     server,
-    stats: buildServerStats(server, version, mainData),
-    torrents,
-    categories: buildCategories(mainData, torrents),
-    tags: buildTags(mainData, torrents),
+    stats: liveState.stats,
+    torrents: liveState.torrents,
+    categories: liveState.categories,
+    tags: liveState.tags,
   };
 }
 
@@ -64,7 +52,9 @@ export async function getAppState(userId: string, requestedServerId?: string | n
   const selected = liveServers.find((server) => server.server.id === requestedServerId)
     ?? liveServers[0]
     ?? null;
-  const dailyUploadVisuals = selected && selected.stats.status === 'online'
+  const dailyUploadVisuals = selected
+    && selected.stats.status === 'online'
+    && selected.server.type === 'qbittorrent'
     ? await buildDailyUploadVisuals(selected.server, selected.torrents, userTimezone).catch(() => ({
       countryUploads: [],
       trackerShares: [],
@@ -97,22 +87,7 @@ export async function getTorrentDetails(userId: string, serverId: string, hash: 
     return null;
   }
 
-  const client = new QbittorrentClient(server);
-  const mainData = await client.getMainData();
-  const torrent = mainData.torrents?.[hash];
-
-  if (!torrent) {
-    return null;
-  }
-
-  const [properties, files, peers, trackers] = await Promise.all([
-    client.getTorrentProperties(hash),
-    client.getTorrentFiles(hash),
-    client.getTorrentPeers(hash),
-    client.getTorrentTrackers(hash),
-  ]);
-
-  return mapTorrentDetails(serverId, hash, torrent, properties, files, peers, trackers);
+  return getDownloaderClient(server).getTorrentDetails(hash);
 }
 
 export async function pauseTorrent(userId: string, serverId: string, hash: string) {
@@ -122,7 +97,7 @@ export async function pauseTorrent(userId: string, serverId: string, hash: strin
     return null;
   }
 
-  const client = new QbittorrentClient(server);
+  const client = getDownloaderClient(server);
   await client.pauseTorrents([hash]);
   return true;
 }
@@ -134,7 +109,7 @@ export async function resumeTorrent(userId: string, serverId: string, hash: stri
     return null;
   }
 
-  const client = new QbittorrentClient(server);
+  const client = getDownloaderClient(server);
   await client.resumeTorrents([hash]);
   return true;
 }
@@ -151,7 +126,7 @@ export async function deleteTorrent(
     return null;
   }
 
-  const client = new QbittorrentClient(server);
+  const client = getDownloaderClient(server);
   await client.deleteTorrents([hash], deleteFiles);
   return true;
 }
@@ -174,12 +149,11 @@ export async function addTorrentToServer(
     return null;
   }
 
-  const client = new QbittorrentClient(server);
+  const client = getDownloaderClient(server);
   await client.addTorrent(input);
   return true;
 }
 
 export async function verifyServerConnection(server: ServerConnection) {
-  const client = new QbittorrentClient(server);
-  await client.getVersion();
+  await getDownloaderClient(server).verifyConnection();
 }

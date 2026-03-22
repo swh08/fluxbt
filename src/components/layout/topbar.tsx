@@ -44,6 +44,7 @@ interface MobileTopbarProps {
   onTimezoneChange?: (timezone: string) => Promise<void>;
   addTorrentCategories?: Category[];
   addTorrentTags?: Tag[];
+  supportsTorrentMetadata?: boolean;
   onAddTorrent?: (input: AddTorrentSubmission) => Promise<void>;
 }
 
@@ -58,6 +59,7 @@ export function MobileTopbar({
   onTimezoneChange,
   addTorrentCategories = [],
   addTorrentTags = [],
+  supportsTorrentMetadata = true,
   onAddTorrent,
 }: MobileTopbarProps) {
   const { t } = useI18n();
@@ -129,6 +131,7 @@ export function MobileTopbar({
         onOpenChange={setAddDialogOpen}
         categories={addTorrentCategories}
         tags={addTorrentTags}
+        supportsMetadata={supportsTorrentMetadata}
         onSubmit={onAddTorrent ?? (async () => {})}
       />
     </>
@@ -168,6 +171,7 @@ interface TopbarProps {
   onTimezoneChange?: (timezone: string) => Promise<void>;
   addTorrentCategories?: Category[];
   addTorrentTags?: Tag[];
+  supportsTorrentMetadata?: boolean;
   onAddTorrent?: (input: AddTorrentSubmission) => Promise<void>;
 }
 
@@ -194,6 +198,7 @@ export function Topbar({
   onTimezoneChange,
   addTorrentCategories = [],
   addTorrentTags = [],
+  supportsTorrentMetadata = true,
   onAddTorrent,
 }: TopbarProps) {
   const { t } = useI18n();
@@ -241,50 +246,53 @@ export function Topbar({
           </div>
 
           {/* Category Select - Hidden on small tablet */}
-          <Select value={selectedCategory} onValueChange={(v) => onCategoryChange?.(v)}>
-            <SelectTrigger
-              className={cn(
-                'h-8 w-28 lg:w-32 text-sm hidden sm:flex',
-                surfaceBorderClass,
-                backgroundImage
-                  ? 'bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45'
-                  : 'bg-background',
-              )}
-            >
-              <SelectValue placeholder={t('transfers.category')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('transfers.allCategories')}</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.id === '__none__' ? t('addTorrent.noCategory') : cat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {supportsTorrentMetadata && (
+            <>
+              <Select value={selectedCategory} onValueChange={(v) => onCategoryChange?.(v)}>
+                <SelectTrigger
+                  className={cn(
+                    'h-8 w-28 lg:w-32 text-sm hidden sm:flex',
+                    surfaceBorderClass,
+                    backgroundImage
+                      ? 'bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45'
+                      : 'bg-background',
+                  )}
+                >
+                  <SelectValue placeholder={t('transfers.category')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('transfers.allCategories')}</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.id === '__none__' ? t('addTorrent.noCategory') : cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-          {/* Tags Select - Hidden on tablet */}
-          <Select value={selectedTag} onValueChange={(v) => onTagChange?.(v)}>
-            <SelectTrigger
-              className={cn(
-                'h-8 w-24 lg:w-28 text-sm hidden lg:flex',
-                surfaceBorderClass,
-                backgroundImage
-                  ? 'bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45'
-                  : 'bg-background',
-              )}
-            >
-              <SelectValue placeholder={t('transfers.tags')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('transfers.allTags')}</SelectItem>
-              {tags.map((tag) => (
-                <SelectItem key={tag.id} value={tag.id}>
-                  {tag.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <Select value={selectedTag} onValueChange={(v) => onTagChange?.(v)}>
+                <SelectTrigger
+                  className={cn(
+                    'h-8 w-24 lg:w-28 text-sm hidden lg:flex',
+                    surfaceBorderClass,
+                    backgroundImage
+                      ? 'bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45'
+                      : 'bg-background',
+                  )}
+                >
+                  <SelectValue placeholder={t('transfers.tags')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('transfers.allTags')}</SelectItem>
+                  {tags.map((tag) => (
+                    <SelectItem key={tag.id} value={tag.id}>
+                      {tag.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </>
+          )}
         </div>
       )}
 
@@ -363,6 +371,7 @@ export function Topbar({
         onOpenChange={setAddDialogOpen}
         categories={addTorrentCategories}
         tags={addTorrentTags}
+        supportsMetadata={supportsTorrentMetadata}
         onSubmit={onAddTorrent ?? (async () => {})}
       />
     </>

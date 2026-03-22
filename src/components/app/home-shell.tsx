@@ -117,6 +117,7 @@ export function HomeShell({ currentUser }: HomeShellProps) {
   const selectedServer = useMemo(() => {
     return appState.servers.find((server) => server.id === selectedServerId) ?? null;
   }, [appState.servers, selectedServerId]);
+  const supportsTorrentMetadata = selectedServer?.type !== 'transmission';
 
   const handleFilterChange = useCallback((filter: StatusFilter) => {
     setActiveFilter(filter);
@@ -310,6 +311,7 @@ export function HomeShell({ currentUser }: HomeShellProps) {
             onTimezoneChange={handleTimezoneChange}
             addTorrentCategories={appState.categories.filter((category) => category.id !== '__none__')}
             addTorrentTags={appState.tags}
+            supportsTorrentMetadata={supportsTorrentMetadata}
             onAddTorrent={handleAddTorrent}
           />
         )}
@@ -360,6 +362,7 @@ export function HomeShell({ currentUser }: HomeShellProps) {
                 torrents={appState.torrents}
                 categories={appState.categories}
                 tags={appState.tags}
+                selectedServerType={selectedServer?.type ?? null}
                 onRefresh={refreshState}
               />
             </motion.div>

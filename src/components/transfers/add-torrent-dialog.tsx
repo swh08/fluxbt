@@ -41,6 +41,7 @@ interface AddTorrentDialogProps {
   onOpenChange: (open: boolean) => void;
   categories: Category[];
   tags: TorrentTag[];
+  supportsMetadata?: boolean;
   onSubmit: (input: AddTorrentSubmission) => Promise<void>;
 }
 
@@ -58,6 +59,7 @@ export function AddTorrentDialog({
   onOpenChange,
   categories,
   tags,
+  supportsMetadata = true,
   onSubmit,
 }: AddTorrentDialogProps) {
   const { t } = useI18n();
@@ -95,8 +97,8 @@ export function AddTorrentDialog({
         magnetLink,
         torrentFile,
         savePath,
-        category,
-        tags: selectedTags,
+        category: supportsMetadata ? category : 'none',
+        tags: supportsMetadata ? selectedTags : [],
         startImmediately,
       });
       handleClose();
@@ -212,76 +214,78 @@ export function AddTorrentDialog({
             </div>
           </div>
 
-          {/* Category */}
-          <div className="space-y-2">
-            <Label htmlFor="category">{t('addTorrent.category')}</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger id="category">
-                <SelectValue placeholder={t('addTorrent.selectCategory')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">{t('addTorrent.noCategory')}</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Tags */}
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <TagIcon className="w-4 h-4" />
-              {t('addTorrent.tags')}
-            </Label>
-            
-            {/* Selected Tags */}
-            {selectedTags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-2">
-                {selectedTags.map((tagId) => {
-                  const tag = tags.find(t => t.id === tagId);
-                  if (!tag) return null;
-                  return (
-                    <Badge
-                      key={tagId}
-                      variant="secondary"
-                      className="gap-1 pr-1"
-                    >
-                      {tag.name}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-4 w-4 p-0 hover:bg-transparent"
-                        onClick={() => handleRemoveTag(tagId)}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </Badge>
-                  );
-                })}
+          {supportsMetadata && (
+            <>
+              {/* Category */}
+              <div className="space-y-2">
+                <Label htmlFor="category">{t('addTorrent.category')}</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger id="category">
+                    <SelectValue placeholder={t('addTorrent.selectCategory')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t('addTorrent.noCategory')}</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            )}
 
-            {/* Available Tags */}
-            <div className="flex flex-wrap gap-1.5">
-              {tags
-                .filter(tag => !selectedTags.includes(tag.id))
-                .map((tag) => (
-                  <Button
-                    key={tag.id}
-                    variant="outline"
-                    size="sm"
-                    className="h-7 text-xs gap-1"
-                    onClick={() => handleAddTag(tag.id)}
-                  >
-                    <Plus className="w-3 h-3" />
-                    {tag.name}
-                  </Button>
-                ))}
-            </div>
-          </div>
+              {/* Tags */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <TagIcon className="w-4 h-4" />
+                  {t('addTorrent.tags')}
+                </Label>
+
+                {selectedTags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {selectedTags.map((tagId) => {
+                      const tag = tags.find(t => t.id === tagId);
+                      if (!tag) return null;
+                      return (
+                        <Badge
+                          key={tagId}
+                          variant="secondary"
+                          className="gap-1 pr-1"
+                        >
+                          {tag.name}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-4 w-4 p-0 hover:bg-transparent"
+                            onClick={() => handleRemoveTag(tagId)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-1.5">
+                  {tags
+                    .filter(tag => !selectedTags.includes(tag.id))
+                    .map((tag) => (
+                      <Button
+                        key={tag.id}
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs gap-1"
+                        onClick={() => handleAddTag(tag.id)}
+                      >
+                        <Plus className="w-3 h-3" />
+                        {tag.name}
+                      </Button>
+                    ))}
+                </div>
+              </div>
+            </>
+          )}
 
           <Separator />
 
