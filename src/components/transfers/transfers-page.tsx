@@ -271,7 +271,9 @@ export function TransfersPage({
             transition={{ duration: 0.15, ease: 'easeInOut' }}
             className={cn(
               'min-h-0 min-w-0 flex-1 overflow-hidden',
-              backgroundImage ? 'bg-transparent' : 'bg-background',
+              backgroundImage
+                ? 'bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45'
+                : 'bg-background',
             )}
           >
             <TransferList

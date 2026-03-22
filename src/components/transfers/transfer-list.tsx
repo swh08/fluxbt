@@ -264,12 +264,12 @@ export function TransferList({
           {renderSortIcon('eta')}
         </button>
 
-        {/* Seeds/Peers - w-16 - hidden on tablet */}
+        {/* Seeds/Peers - w-24 - hidden on tablet */}
         <button
           onClick={() => handleSort('seeds')}
-          className="w-16 flex-shrink-0 items-center gap-1 justify-start cursor-pointer hover:text-foreground transition-colors hidden lg:flex"
+          className="w-24 flex-shrink-0 items-center gap-1 justify-start cursor-pointer hover:text-foreground transition-colors hidden lg:flex"
         >
-          <span>S/P</span>
+          <span>{t('columns.seeds')}/{t('columns.peers')}</span>
           {renderSortIcon('seeds')}
         </button>
 

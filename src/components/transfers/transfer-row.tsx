@@ -258,8 +258,8 @@ export function TransferRow({ torrent, isSelected, onClick, onAction }: Transfer
         </span>
       </div>
 
-      {/* Seeds/Peers Column - w-16 - hidden on tablet */}
-      <div className="w-16 flex-shrink-0 hidden lg:block">
+      {/* Seeds/Peers Column - w-24 - hidden on tablet */}
+      <div className="w-24 flex-shrink-0 hidden lg:block">
         <span className="text-xs font-mono text-muted-foreground">
           {torrent.seeds}/{torrent.peers}
         </span>
