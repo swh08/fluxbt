@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useMemo, useCallback, useSyncExternalStore, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DashboardPage } from '@/components/dashboard/dashboard-page';
@@ -250,18 +251,14 @@ export function HomeShell({ currentUser }: HomeShellProps) {
       >
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 overflow-hidden rounded-xl">
-            <svg className="h-12 w-12 animate-pulse" viewBox="0 0 32 32" fill="none">
-              <defs>
-                <linearGradient id="loadingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#3B82F6" />
-                  <stop offset="100%" stopColor="#1D4ED8" />
-                </linearGradient>
-              </defs>
-              <rect x="0" y="0" width="32" height="32" rx="6" fill="url(#loadingGrad)" />
-              <path d="M7 5 L21 5 L21 8 L10 8 L10 12 L18 12 L18 15 L10 15 L10 23 L7 23 Z" fill="white" />
-              <circle cx="26" cy="26" r="3" fill="#60A5FA" />
-              <circle cx="26" cy="26" r="1.5" fill="white" />
-            </svg>
+            <Image
+              src="/logo.svg"
+              alt="FluxBT logo"
+              width={48}
+              height={48}
+              priority
+              className="h-12 w-12 animate-pulse"
+            />
           </div>
           <div className="flex items-center gap-1.5">
             <div className="h-2 w-2 animate-bounce rounded-full bg-primary" style={{ animationDelay: '0ms' }} />

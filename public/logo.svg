@@ -1,42 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <defs>
-    <!-- Primary gradient -->
-    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3B82F6"/>
-      <stop offset="100%" style="stop-color:#1D4ED8"/>
-    </linearGradient>
-    <!-- Layer gradients -->
-    <linearGradient id="layer1" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#60A5FA"/>
-      <stop offset="100%" style="stop-color:#3B82F6"/>
-    </linearGradient>
-    <linearGradient id="layer2" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#93C5FD"/>
-      <stop offset="100%" style="stop-color:#60A5FA"/>
-    </linearGradient>
-    <linearGradient id="layer3" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#BFDBFE"/>
-      <stop offset="100%" style="stop-color:#93C5FD"/>
-    </linearGradient>
-  </defs>
-  
-  <!-- Background rounded square -->
-  <rect x="2" y="2" width="28" height="28" rx="6" fill="url(#primaryGrad)"/>
-  
-  <!-- Layered "F" design - representing data layers/torrents -->
-  <!-- Back layer -->
-  <path d="M9 7 L23 7 L23 10 L12 10 L12 14 L20 14 L20 17 L12 17 L12 25 L9 25 Z" 
-        fill="url(#layer3)" opacity="0.6"/>
-  
-  <!-- Middle layer -->
-  <path d="M8 6 L22 6 L22 9 L11 9 L11 13 L19 13 L19 16 L11 16 L11 24 L8 24 Z" 
-        fill="url(#layer2)" opacity="0.8"/>
-  
-  <!-- Front layer (main F) -->
-  <path d="M7 5 L21 5 L21 8 L10 8 L10 12 L18 12 L18 15 L10 15 L10 23 L7 23 Z" 
-        fill="white"/>
-  
-  <!-- Small dot accent (representing data/BT node) -->
-  <circle cx="24" cy="24" r="3" fill="#60A5FA"/>
-  <circle cx="24" cy="24" r="1.5" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="8" height="20" x="2" y="2" rx="2" stroke="#3b82f6"/>
+  <rect width="8" height="20" x="14" y="2" rx="2" stroke="#10b981"/>
+  <line x1="6" x2="6.01" y1="18" y2="18" stroke="#10b981"/>
+  <line x1="18" x2="18.01" y1="6" y2="6" stroke="#3b82f6"/>
 </svg>

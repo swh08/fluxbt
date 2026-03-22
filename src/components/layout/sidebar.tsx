@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
 import { useBackground } from '@/contexts/background-context';
@@ -171,22 +172,14 @@ function SidebarContent({
         )}>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
-              <svg
-                className="w-8 h-8"
-                viewBox="0 0 32 32"
-                fill="none"
-              >
-                <defs>
-                  <linearGradient id="sidebarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#3B82F6"/>
-                    <stop offset="100%" stopColor="#1D4ED8"/>
-                  </linearGradient>
-                </defs>
-                <rect x="0" y="0" width="32" height="32" rx="6" fill="url(#sidebarGrad)"/>
-                <path d="M7 5 L21 5 L21 8 L10 8 L10 12 L18 12 L18 15 L10 15 L10 23 L7 23 Z" fill="white"/>
-                <circle cx="26" cy="26" r="3" fill="#60A5FA"/>
-                <circle cx="26" cy="26" r="1.5" fill="white"/>
-              </svg>
+              <Image
+                src="/logo.svg"
+                alt="FluxBT logo"
+                width={32}
+                height={32}
+                priority
+                className="h-8 w-8"
+              />
             </div>
             {/* App name - hidden when collapsed */}
             <div className={cn(
