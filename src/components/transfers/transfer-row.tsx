@@ -283,7 +283,7 @@ export const TransferRow = memo(function TransferRow({
 
       {/* Actions Column - w-12 lg:w-20 */}
       <div className="w-12 lg:w-20 flex-shrink-0 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        {torrent.status === 'paused' || torrent.status === 'queued' ? (
+        {torrent.status === 'paused' || torrent.status === 'queued' || torrent.status === 'error' ? (
           <Button
             variant="ghost"
             size="icon"
@@ -293,7 +293,7 @@ export const TransferRow = memo(function TransferRow({
           >
             <Play className="w-3.5 h-3.5" />
           </Button>
-        ) : torrent.status !== 'error' && torrent.status !== 'seeding' ? (
+        ) : torrent.status === 'downloading' || torrent.status === 'seeding' ? (
           <Button
             variant="ghost"
             size="icon"

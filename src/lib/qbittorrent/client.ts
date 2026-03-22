@@ -1,8 +1,10 @@
 import type { ServerConnection } from '@prisma/client';
 
 type CookieKey = `${string}|${string}`;
+type TorrentActionApiStyle = 'legacy' | 'v5';
 
 const sessionCookies = new Map<CookieKey, string>();
+const torrentActionApiStyles = new Map<CookieKey, TorrentActionApiStyle>();
 
 function getCookieKey(server: ServerConnection): CookieKey {
   return `${server.protocol}://${server.host}:${server.port}|${server.username}`;
@@ -18,6 +20,16 @@ function getReferer(server: ServerConnection) {
 
 function encodeHashes(hashes: string[]) {
   return hashes.join('|');
+}
+
+function parseTorrentActionApiStyle(version: string): TorrentActionApiStyle | null {
+  const majorVersion = Number.parseInt(version.trim().split('.')[0] ?? '', 10);
+
+  if (Number.isNaN(majorVersion)) {
+    return null;
+  }
+
+  return majorVersion >= 5 ? 'v5' : 'legacy';
 }
 
 async function parseResponse<T>(response: Response): Promise<T> {
@@ -150,6 +162,98 @@ export interface AddTorrentInput {
 export class QbittorrentClient {
   constructor(private readonly server: ServerConnection) {}
 
+  private getTorrentActionApiStyleKey() {
+    return getCookieKey(this.server);
+  }
+
+  private getTorrentActionPath(action: 'pause' | 'resume', style: TorrentActionApiStyle) {
+    if (action === 'pause') {
+      return style === 'v5' ? '/api/v2/torrents/stop' : '/api/v2/torrents/pause';
+    }
+
+    return style === 'v5' ? '/api/v2/torrents/start' : '/api/v2/torrents/resume';
+  }
+
+  private getFallbackTorrentActionStyle(style: TorrentActionApiStyle): TorrentActionApiStyle {
+    return style === 'v5' ? 'legacy' : 'v5';
+  }
+
+  private async resolveTorrentActionApiStyle(): Promise<TorrentActionApiStyle | null> {
+    const cacheKey = this.getTorrentActionApiStyleKey();
+    const cachedStyle = torrentActionApiStyles.get(cacheKey);
+
+    if (cachedStyle) {
+      return cachedStyle;
+    }
+
+    try {
+      const version = await this.getVersion();
+      const parsedStyle = parseTorrentActionApiStyle(version);
+
+      if (parsedStyle) {
+        torrentActionApiStyles.set(cacheKey, parsedStyle);
+      }
+
+      return parsedStyle;
+    } catch {
+      return null;
+    }
+  }
+
+  private async requestWithFallback<T>(
+    paths: string[],
+    createInit: () => RequestInit,
+  ): Promise<{ path: string; data: T }> {
+    let lastError: unknown;
+
+    for (let index = 0; index < paths.length; index += 1) {
+      try {
+        return {
+          path: paths[index],
+          data: await this.request<T>(paths[index], createInit()),
+        };
+      } catch (error) {
+        lastError = error;
+
+        const canRetryWithFallback = error instanceof QbittorrentClientError
+          && error.status === 404
+          && index < paths.length - 1;
+
+        if (!canRetryWithFallback) {
+          throw error;
+        }
+      }
+    }
+
+    throw lastError;
+  }
+
+  private async requestTorrentAction(action: 'pause' | 'resume', hashes: string[]) {
+    const preferredStyle = await this.resolveTorrentActionApiStyle() ?? 'legacy';
+    const fallbackStyle = this.getFallbackTorrentActionStyle(preferredStyle);
+    const paths = [
+      this.getTorrentActionPath(action, preferredStyle),
+      this.getTorrentActionPath(action, fallbackStyle),
+    ].filter((path, index, currentPaths) => currentPaths.indexOf(path) === index);
+
+    const result = await this.requestWithFallback<string>(
+      paths,
+      () => ({
+        method: 'POST',
+        body: new URLSearchParams({
+          hashes: encodeHashes(hashes),
+        }),
+      }),
+    );
+
+    torrentActionApiStyles.set(
+      this.getTorrentActionApiStyleKey(),
+      result.path === this.getTorrentActionPath(action, preferredStyle) ? preferredStyle : fallbackStyle,
+    );
+
+    return result.data;
+  }
+
   private async login(force = false) {
     const cookieKey = getCookieKey(this.server);
 
@@ -247,21 +351,11 @@ export class QbittorrentClient {
   }
 
   pauseTorrents(hashes: string[]) {
-    return this.request<string>('/api/v2/torrents/pause', {
-      method: 'POST',
-      body: new URLSearchParams({
-        hashes: encodeHashes(hashes),
-      }),
-    });
+    return this.requestTorrentAction('pause', hashes);
   }
 
   resumeTorrents(hashes: string[]) {
-    return this.request<string>('/api/v2/torrents/resume', {
-      method: 'POST',
-      body: new URLSearchParams({
-        hashes: encodeHashes(hashes),
-      }),
-    });
+    return this.requestTorrentAction('resume', hashes);
   }
 
   deleteTorrents(hashes: string[], deleteFiles = false) {
