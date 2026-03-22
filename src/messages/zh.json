@@ -36,7 +36,6 @@
     "downloading": "下载中",
     "seeding": "做种中",
     "paused": "已暂停",
-    "queued": "排队中",
     "error": "错误"
   },
   "dashboard": {

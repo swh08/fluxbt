@@ -95,7 +95,7 @@ export function mapTransmissionTorrent(serverId: string, torrent: TransmissionTo
     size: torrent.sizeWhenDone || torrent.totalSize || 0,
     path: torrent.downloadDir,
     trackers: getTrackerUrls(torrent),
-    status: mapTransmissionStatusToStatus(torrent.status, torrent.error),
+    status: mapTransmissionStatusToStatus(torrent.status, torrent.isFinished, torrent.error),
     progress: getTorrentProgress(torrent),
     downloadSpeed: torrent.rateDownload,
     uploadSpeed: torrent.rateUpload,

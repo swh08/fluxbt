@@ -1,12 +1,8 @@
 import type { TorrentStatus } from '@/lib/types';
 
 export function mapQbittorrentStateToStatus(state: string): TorrentStatus {
-  if (state.startsWith('paused')) {
+  if (state.startsWith('paused') || state.startsWith('queued')) {
     return 'paused';
-  }
-
-  if (state.startsWith('queued')) {
-    return 'queued';
   }
 
   if (
@@ -35,7 +31,7 @@ export function mapQbittorrentStateToStatus(state: string): TorrentStatus {
     return 'error';
   }
 
-  return 'queued';
+  return 'paused';
 }
 
 export function getStatusBgColor(status: TorrentStatus): string {
@@ -46,8 +42,6 @@ export function getStatusBgColor(status: TorrentStatus): string {
       return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
     case 'paused':
       return 'bg-slate-500/10 text-slate-500 border-slate-500/20';
-    case 'queued':
-      return 'bg-sky-400/10 text-sky-400 border-sky-400/20';
     case 'error':
       return 'bg-red-500/10 text-red-500 border-red-500/20';
     default:
@@ -67,8 +61,6 @@ export function getProgressColor(status: TorrentStatus, progress: number): strin
       return 'bg-emerald-500';
     case 'paused':
       return 'bg-slate-500';
-    case 'queued':
-      return 'bg-sky-400';
     case 'error':
       return 'bg-red-500';
     default:

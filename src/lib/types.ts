@@ -1,6 +1,6 @@
 // Torrent Manager Types
 
-export type TorrentStatus = 'downloading' | 'seeding' | 'paused' | 'queued' | 'error';
+export type TorrentStatus = 'downloading' | 'seeding' | 'paused' | 'error';
 
 export type TorrentType = 'ISO' | 'Software' | 'Video' | 'Audio' | 'Document' | 'Archive' | 'Other';
 

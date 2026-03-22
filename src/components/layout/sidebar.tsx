@@ -20,7 +20,6 @@ import {
   Download,
   Upload,
   Pause,
-  Clock,
   AlertCircle,
   ChevronDown,
   ChevronRight,
@@ -58,7 +57,6 @@ const statusIcons: Record<TorrentStatus, React.ElementType> = {
   downloading: Download,
   seeding: Upload,
   paused: Pause,
-  queued: Clock,
   error: AlertCircle,
 };
 
@@ -66,7 +64,6 @@ const statusColors: Record<TorrentStatus, string> = {
   downloading: 'text-blue-500',
   seeding: 'text-emerald-500',
   paused: 'text-slate-500',
-  queued: 'text-sky-400',
   error: 'text-red-500',
 };
 
@@ -97,7 +94,7 @@ function SidebarContent({
   const sidebarBorderClass = backgroundImage ? 'border-white/10' : 'border-sidebar-border';
   const panelBorderClass = backgroundImage ? 'border-white/15' : 'border-border';
 
-  const statuses: TorrentStatus[] = ['downloading', 'seeding', 'paused', 'queued', 'error'];
+  const statuses: TorrentStatus[] = ['downloading', 'seeding', 'paused', 'error'];
 
   const getCount = (status: TorrentStatus | 'all'): number => {
     if (status === 'all') return torrents.length;

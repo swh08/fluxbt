@@ -57,7 +57,6 @@ export const MobileTransferRow = memo(function MobileTransferRow({
             torrent.status === 'downloading' && 'bg-blue-500',
             torrent.status === 'seeding' && 'bg-emerald-500',
             torrent.status === 'paused' && 'bg-slate-500',
-            torrent.status === 'queued' && 'bg-sky-400',
             torrent.status === 'error' && 'bg-red-500'
           )}
         />
@@ -181,7 +180,6 @@ export const TransferRow = memo(function TransferRow({
             torrent.status === 'downloading' && 'bg-blue-500',
             torrent.status === 'seeding' && 'bg-emerald-500',
             torrent.status === 'paused' && 'bg-slate-500',
-            torrent.status === 'queued' && 'bg-sky-400',
             torrent.status === 'error' && 'bg-red-500'
           )}
         />
@@ -283,7 +281,7 @@ export const TransferRow = memo(function TransferRow({
 
       {/* Actions Column - w-12 lg:w-20 */}
       <div className="w-12 lg:w-20 flex-shrink-0 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        {torrent.status === 'paused' || torrent.status === 'queued' || torrent.status === 'error' ? (
+        {torrent.status === 'paused' || torrent.status === 'error' ? (
           <Button
             variant="ghost"
             size="icon"
