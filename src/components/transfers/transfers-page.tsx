@@ -7,7 +7,7 @@ import { DetailsPanel } from '@/components/transfers/details-panel';
 import { MobileDetailsSheet } from '@/components/transfers/mobile-details-sheet';
 import type { AddTorrentSubmission } from '@/components/transfers/add-torrent-dialog';
 import { StatusFilter, type Category, type Tag, type Torrent } from '@/lib/types';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useI18n } from '@/contexts/i18n-context';
 import { useBackground } from '@/contexts/background-context';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -74,6 +74,11 @@ export function TransfersPage({
   const [selectedTorrentId, setSelectedTorrentId] = useState<string | null>(null);
   const [selectedTorrentDetails, setSelectedTorrentDetails] = useState<Torrent | null>(null);
   const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
+  const selectedTorrentIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    selectedTorrentIdRef.current = selectedTorrentId;
+  }, [selectedTorrentId]);
 
   useEffect(() => {
     setSelectedTorrentId(null);
@@ -140,8 +145,8 @@ export function TransfersPage({
 
   const selectedTorrent = mergeSelectedTorrent(baseSelectedTorrent, selectedTorrentDetails);
 
-  const handleSelect = (id: string) => {
-    const shouldResetDetails = shouldResetSelectedTorrentDetails(selectedTorrentId, id);
+  const handleSelect = useCallback((id: string) => {
+    const shouldResetDetails = shouldResetSelectedTorrentDetails(selectedTorrentIdRef.current, id);
 
     setSelectedTorrentId(id);
 
@@ -152,9 +157,9 @@ export function TransfersPage({
     if (isMobile) {
       setDetailsSheetOpen(true);
     }
-  };
+  }, [isMobile]);
 
-  const handleTorrentAction = async (torrent: Torrent, action: 'pause' | 'resume' | 'delete') => {
+  const handleTorrentAction = useCallback(async (torrent: Torrent, action: 'pause' | 'resume' | 'delete') => {
     if (!selectedServerId) {
       return;
     }
@@ -176,13 +181,13 @@ export function TransfersPage({
       return;
     }
 
-    if (action === 'delete' && selectedTorrentId === torrent.id) {
+    if (action === 'delete' && selectedTorrentIdRef.current === torrent.id) {
       setSelectedTorrentId(null);
       setSelectedTorrentDetails(null);
     }
 
     await onRefresh(selectedServerId);
-  };
+  }, [onRefresh, selectedServerId]);
 
   const handleAddTorrent = async (input: AddTorrentSubmission) => {
     if (!selectedServerId) {
@@ -286,32 +291,24 @@ export function TransfersPage({
           </motion.div>
         </AnimatePresence>
 
-        <AnimatePresence>
-          {!isMobile && selectedTorrent && (
-            <motion.div
-              key="details-panel"
-              layout
-              data-details-panel
-              initial={{ x: 24, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 24, opacity: 0 }}
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className={cn(
-                'min-h-0 flex-shrink-0 overflow-hidden',
-                isTablet ? 'w-72' : 'w-80 lg:w-96',
-              )}
-            >
-              <DetailsPanel
-                torrent={selectedTorrent}
-                isCompact={isTablet}
-                onClose={() => {
-                  setSelectedTorrentId(null);
-                  setSelectedTorrentDetails(null);
-                }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {!isMobile && (
+          <div
+            data-details-panel
+            className={cn(
+              'min-h-0 flex-shrink-0 overflow-hidden',
+              isTablet ? 'w-72' : 'w-80 lg:w-96',
+            )}
+          >
+            <DetailsPanel
+              torrent={selectedTorrent}
+              isCompact={isTablet}
+              onClose={() => {
+                setSelectedTorrentId(null);
+                setSelectedTorrentDetails(null);
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {isMobile && (

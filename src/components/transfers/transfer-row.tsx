@@ -1,5 +1,6 @@
 'use client';
 
+import { memo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
 import { Torrent } from '@/lib/types';
@@ -21,19 +22,26 @@ import {
 interface TransferRowProps {
   torrent: Torrent;
   isSelected: boolean;
-  onClick: () => void;
+  onSelect: (id: string) => void;
   onAction?: (torrent: Torrent, action: 'pause' | 'resume' | 'delete') => void;
 }
 
 // Mobile Card Row
-export function MobileTransferRow({ torrent, isSelected, onClick }: TransferRowProps) {
+export const MobileTransferRow = memo(function MobileTransferRow({
+  torrent,
+  isSelected,
+  onSelect,
+}: TransferRowProps) {
   const { t } = useI18n();
   const categoryBadgeLabel = getCategoryBadgeLabel(torrent.category);
+  const handleClick = useCallback(() => {
+    onSelect(torrent.id);
+  }, [onSelect, torrent.id]);
 
   return (
     <div
       data-torrent-row
-      onClick={onClick}
+      onClick={handleClick}
       className={cn(
         'p-3 rounded-lg border cursor-pointer transition-all duration-150',
         'bg-card border-border',
@@ -134,12 +142,20 @@ export function MobileTransferRow({ torrent, isSelected, onClick }: TransferRowP
       </div>
     </div>
   );
-}
+});
 
 // Desktop/Tablet Row
-export function TransferRow({ torrent, isSelected, onClick, onAction }: TransferRowProps) {
+export const TransferRow = memo(function TransferRow({
+  torrent,
+  isSelected,
+  onSelect,
+  onAction,
+}: TransferRowProps) {
   const { t } = useI18n();
   const categoryBadgeLabel = getCategoryBadgeLabel(torrent.category);
+  const handleRowClick = useCallback(() => {
+    onSelect(torrent.id);
+  }, [onSelect, torrent.id]);
 
   const handleActionClick = (e: React.MouseEvent, action: 'pause' | 'resume' | 'delete') => {
     e.stopPropagation();
@@ -149,7 +165,7 @@ export function TransferRow({ torrent, isSelected, onClick, onAction }: Transfer
   return (
     <div
       data-torrent-row
-      onClick={onClick}
+      onClick={handleRowClick}
       className={cn(
         'group flex items-center gap-2 px-4 py-3 cursor-pointer',
         'border-b border-border/50 transition-colors duration-150',
@@ -300,4 +316,4 @@ export function TransferRow({ torrent, isSelected, onClick, onAction }: Transfer
       </div>
     </div>
   );
-}
+});

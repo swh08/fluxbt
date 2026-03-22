@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useI18n } from '@/contexts/i18n-context';
 import { Torrent } from '@/lib/types';
 import { TransferRow, MobileTransferRow } from './transfer-row';
 import { ArrowDown, ArrowUp, ArrowUpDown, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
 
 interface TransferListProps {
   torrents: Torrent[];
@@ -20,6 +19,11 @@ interface TransferListProps {
 export type SortField = 'name' | 'progress' | 'downloadSpeed' | 'uploadSpeed' | 'eta' | 'seeds' | 'peers' | 'size' | 'addedAt';
 export type SortDirection = 'asc' | 'desc';
 
+const DESKTOP_OVERSCAN = 8;
+const DESKTOP_ROW_HEIGHT_ESTIMATE = 72;
+const MOBILE_OVERSCAN = 6;
+const MOBILE_ROW_HEIGHT_ESTIMATE = 132;
+
 export function TransferList({
   torrents,
   selectedId,
@@ -30,6 +34,13 @@ export function TransferList({
   const { t } = useI18n();
   const [sortField, setSortField] = useState<SortField>('addedAt');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const mobileScrollAreaRef = useRef<HTMLDivElement | null>(null);
+  const [mobileScrollTop, setMobileScrollTop] = useState(0);
+  const [mobileViewportHeight, setMobileViewportHeight] = useState(0);
+  const desktopScrollAreaRef = useRef<HTMLDivElement | null>(null);
+  const [desktopScrollTop, setDesktopScrollTop] = useState(0);
+  const [desktopViewportHeight, setDesktopViewportHeight] = useState(0);
+  const [desktopRowHeight, setDesktopRowHeight] = useState(DESKTOP_ROW_HEIGHT_ESTIMATE);
 
   // Sort torrents
   const sortedTorrents = useMemo(() => {
@@ -88,6 +99,102 @@ export function TransferList({
     });
   }, [torrents, sortField, sortDirection]);
 
+  useEffect(() => {
+    if (!isMobile) {
+      return;
+    }
+
+    const scrollAreaRoot = mobileScrollAreaRef.current;
+
+    if (!scrollAreaRoot) {
+      return;
+    }
+
+    const viewport = scrollAreaRoot.querySelector<HTMLDivElement>('[data-slot="scroll-area-viewport"]');
+
+    if (!viewport) {
+      return;
+    }
+
+    const updateViewportHeight = () => {
+      setMobileViewportHeight(viewport.clientHeight);
+    };
+
+    const updateScrollTop = () => {
+      setMobileScrollTop(viewport.scrollTop);
+    };
+
+    updateViewportHeight();
+    updateScrollTop();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateViewportHeight();
+    });
+
+    resizeObserver.observe(viewport);
+    viewport.addEventListener('scroll', updateScrollTop, { passive: true });
+
+    return () => {
+      resizeObserver.disconnect();
+      viewport.removeEventListener('scroll', updateScrollTop);
+    };
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (isMobile) {
+      return;
+    }
+
+    const scrollAreaRoot = desktopScrollAreaRef.current;
+
+    if (!scrollAreaRoot) {
+      return;
+    }
+
+    const viewport = scrollAreaRoot.querySelector<HTMLDivElement>('[data-slot="scroll-area-viewport"]');
+
+    if (!viewport) {
+      return;
+    }
+
+    const updateViewportHeight = () => {
+      setDesktopViewportHeight(viewport.clientHeight);
+    };
+
+    const updateScrollTop = () => {
+      setDesktopScrollTop(viewport.scrollTop);
+    };
+
+    updateViewportHeight();
+    updateScrollTop();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateViewportHeight();
+    });
+
+    resizeObserver.observe(viewport);
+    viewport.addEventListener('scroll', updateScrollTop, { passive: true });
+
+    return () => {
+      resizeObserver.disconnect();
+      viewport.removeEventListener('scroll', updateScrollTop);
+    };
+  }, [isMobile]);
+
+  const measureDesktopRow = useCallback((node: HTMLDivElement | null) => {
+    if (!node) {
+      return;
+    }
+
+    const measuredHeight = Math.ceil(node.getBoundingClientRect().height);
+
+    if (measuredHeight > 0) {
+      setDesktopRowHeight((previousHeight) => (
+        previousHeight === measuredHeight ? previousHeight : measuredHeight
+      ));
+    }
+  }, []);
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -131,6 +238,32 @@ export function TransferList({
     );
   }
 
+  const mobileMaxScrollTop = Math.max(sortedTorrents.length * MOBILE_ROW_HEIGHT_ESTIMATE - mobileViewportHeight, 0);
+  const mobileEffectiveScrollTop = Math.min(mobileScrollTop, mobileMaxScrollTop);
+  const mobileVisibleCount = mobileViewportHeight > 0
+    ? Math.ceil(mobileViewportHeight / MOBILE_ROW_HEIGHT_ESTIMATE)
+    : 0;
+  const mobileStartIndex = Math.max(0, Math.floor(mobileEffectiveScrollTop / MOBILE_ROW_HEIGHT_ESTIMATE) - MOBILE_OVERSCAN);
+  const mobileEndIndex = mobileVisibleCount > 0
+    ? Math.min(sortedTorrents.length, mobileStartIndex + mobileVisibleCount + MOBILE_OVERSCAN * 2)
+    : Math.min(sortedTorrents.length, MOBILE_OVERSCAN * 2);
+  const mobileVisibleTorrents = sortedTorrents.slice(mobileStartIndex, mobileEndIndex);
+  const mobileOffsetTop = mobileStartIndex * MOBILE_ROW_HEIGHT_ESTIMATE + 8;
+  const mobileTotalHeight = sortedTorrents.length * MOBILE_ROW_HEIGHT_ESTIMATE + 8;
+
+  const desktopMaxScrollTop = Math.max(sortedTorrents.length * desktopRowHeight - desktopViewportHeight, 0);
+  const desktopEffectiveScrollTop = Math.min(desktopScrollTop, desktopMaxScrollTop);
+  const desktopVisibleCount = desktopViewportHeight > 0
+    ? Math.ceil(desktopViewportHeight / desktopRowHeight)
+    : 0;
+  const desktopStartIndex = Math.max(0, Math.floor(desktopEffectiveScrollTop / desktopRowHeight) - DESKTOP_OVERSCAN);
+  const desktopEndIndex = desktopVisibleCount > 0
+    ? Math.min(sortedTorrents.length, desktopStartIndex + desktopVisibleCount + DESKTOP_OVERSCAN * 2)
+    : Math.min(sortedTorrents.length, DESKTOP_OVERSCAN * 2);
+  const desktopVisibleTorrents = sortedTorrents.slice(desktopStartIndex, desktopEndIndex);
+  const desktopOffsetTop = desktopStartIndex * desktopRowHeight;
+  const desktopTotalHeight = sortedTorrents.length * desktopRowHeight;
+
   // Mobile layout - card list
   if (isMobile) {
     return (
@@ -164,28 +297,34 @@ export function TransferList({
         </div>
 
         {/* Card List */}
-        <ScrollArea className="min-h-0 flex-1">
-          <div className="p-2 space-y-2">
-            {sortedTorrents.map((torrent, index) => (
-              <motion.div
-                key={torrent.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ 
-                  duration: 0.2, 
-                  delay: Math.min(index * 0.03, 0.3),
-                  ease: 'easeOut'
+        <div ref={mobileScrollAreaRef} className="min-h-0 flex-1">
+          <ScrollArea className="h-full">
+            <div className="relative" style={{ height: mobileTotalHeight }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  transform: `translateY(${mobileOffsetTop}px)`,
                 }}
               >
-                <MobileTransferRow
-                  torrent={torrent}
-                  isSelected={selectedId === torrent.id}
-                  onClick={() => onSelect(torrent.id)}
-                />
-              </motion.div>
-            ))}
-          </div>
-        </ScrollArea>
+                {mobileVisibleTorrents.map((torrent, index) => (
+                  <div
+                    key={torrent.id}
+                    className="px-2 pb-2"
+                  >
+                    <MobileTransferRow
+                      torrent={torrent}
+                      isSelected={selectedId === torrent.id}
+                      onSelect={onSelect}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollArea>
+        </div>
       </div>
     );
   }
@@ -278,29 +417,35 @@ export function TransferList({
       </div>
 
       {/* Table Body */}
-      <ScrollArea className="min-h-0 flex-1">
-        <div>
-          {sortedTorrents.map((torrent, index) => (
-            <motion.div
-              key={torrent.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ 
-                duration: 0.2, 
-                delay: Math.min(index * 0.02, 0.4),
-                ease: 'easeOut'
+      <div ref={desktopScrollAreaRef} className="min-h-0 flex-1">
+        <ScrollArea className="h-full">
+          <div className="relative" style={{ height: desktopTotalHeight }}>
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                transform: `translateY(${desktopOffsetTop}px)`,
               }}
             >
-              <TransferRow
-                torrent={torrent}
-                isSelected={selectedId === torrent.id}
-                onClick={() => onSelect(torrent.id)}
-                onAction={onAction}
-              />
-            </motion.div>
-          ))}
-        </div>
-      </ScrollArea>
+              {desktopVisibleTorrents.map((torrent, index) => (
+                <div
+                  key={torrent.id}
+                  ref={index === 0 ? measureDesktopRow : undefined}
+                >
+                  <TransferRow
+                    torrent={torrent}
+                    isSelected={selectedId === torrent.id}
+                    onSelect={onSelect}
+                    onAction={onAction}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }
