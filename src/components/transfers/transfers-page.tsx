@@ -24,8 +24,6 @@ interface TransfersPageProps {
   isMobile?: boolean;
   isTablet?: boolean;
   currentUser?: SessionUserIdentity;
-  timezone: string;
-  onTimezoneChange?: (timezone: string) => Promise<void>;
   torrents: Torrent[];
   categories: Category[];
   tags: Tag[];
@@ -61,8 +59,6 @@ export function TransfersPage({
   isMobile = false,
   isTablet = false,
   currentUser,
-  timezone,
-  onTimezoneChange,
   torrents,
   categories,
   tags,
@@ -248,8 +244,6 @@ export function TransfersPage({
           activeFilter={activeFilter}
           onFilterChange={onFilterChange}
           currentUser={currentUser}
-          timezone={timezone}
-          onTimezoneChange={onTimezoneChange}
           addTorrentCategories={categories.filter((category) => category.id !== '__none__')}
           addTorrentTags={tags}
           supportsTorrentMetadata={supportsTorrentMetadata}

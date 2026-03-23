@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useMemo, useCallback, useSyncExternalStore, useEffect } from 'react';
+import { useState, useMemo, useCallback, useSyncExternalStore, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DashboardPage } from '@/components/dashboard/dashboard-page';
 import { MobileSidebar, DesktopSidebar } from '@/components/layout/sidebar';
@@ -14,7 +14,7 @@ import { useBackground } from '@/contexts/background-context';
 import { cn } from '@/lib/utils';
 import type { ServerConfig } from '@/components/servers/server-dialog';
 import { hydrateAppStateSnapshot } from '@/lib/client-data';
-import { DEFAULT_TIMEZONE } from '@/lib/timezones';
+import { DEFAULT_TIMEZONE, isValidTimeZone } from '@/lib/timezones';
 
 const emptySubscribe = () => () => {};
 
@@ -80,6 +80,8 @@ export function HomeShell({ currentUser }: HomeShellProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [appState, setAppState] = useState<AppStateSnapshot>(EMPTY_APP_STATE);
+  const [hasLoadedAppState, setHasLoadedAppState] = useState(false);
+  const lastAutoSyncedTimezoneRef = useRef<string | null>(null);
 
   const refreshState = useCallback(async (preferredServerId?: string | null) => {
     const query = preferredServerId
@@ -96,6 +98,7 @@ export function HomeShell({ currentUser }: HomeShellProps) {
     const nextState = hydrateAppStateSnapshot((await response.json()) as AppStateSnapshot);
     setAppState(nextState);
     setSelectedServerId(nextState.selectedServerId);
+    setHasLoadedAppState(true);
     return nextState;
   }, []);
 
@@ -212,13 +215,13 @@ export function HomeShell({ currentUser }: HomeShellProps) {
     });
 
     if (!response.ok) {
-      console.error('Failed to update timezone.');
-      return;
+      throw new Error('TIMEZONE_UPDATE_FAILED');
     }
 
     const nextTimezone = ((await response.json()) as { timezone?: string }).timezone;
 
     if (nextTimezone) {
+      lastAutoSyncedTimezoneRef.current = nextTimezone;
       setAppState((current) => ({
         ...current,
         userTimezone: nextTimezone,
@@ -227,6 +230,34 @@ export function HomeShell({ currentUser }: HomeShellProps) {
 
     await refreshState(selectedServerId);
   }, [refreshState, selectedServerId]);
+
+  useEffect(() => {
+    if (!hasLoadedAppState) {
+      return;
+    }
+
+    const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone?.trim();
+
+    if (!isValidTimeZone(browserTimeZone)) {
+      return;
+    }
+
+    if (browserTimeZone === appState.userTimezone) {
+      lastAutoSyncedTimezoneRef.current = browserTimeZone;
+      return;
+    }
+
+    if (lastAutoSyncedTimezoneRef.current === browserTimeZone) {
+      return;
+    }
+
+    lastAutoSyncedTimezoneRef.current = browserTimeZone;
+
+    void handleTimezoneChange(browserTimeZone).catch((error) => {
+      console.error('Failed to sync browser timezone.', error);
+      lastAutoSyncedTimezoneRef.current = null;
+    });
+  }, [appState.userTimezone, hasLoadedAppState, handleTimezoneChange]);
 
   const sidebarProps = {
     servers: appState.servers,
@@ -304,8 +335,6 @@ export function HomeShell({ currentUser }: HomeShellProps) {
             downloadSpeed={selectedServer?.downloadSpeed ?? 0}
             uploadSpeed={selectedServer?.uploadSpeed ?? 0}
             currentUser={currentUser}
-            timezone={appState.userTimezone}
-            onTimezoneChange={handleTimezoneChange}
             addTorrentCategories={appState.categories.filter((category) => category.id !== '__none__')}
             addTorrentTags={appState.tags}
             supportsTorrentMetadata={supportsTorrentMetadata}
@@ -329,8 +358,6 @@ export function HomeShell({ currentUser }: HomeShellProps) {
                 isMobile={isMobile}
                 isTablet={isTablet}
                 currentUser={currentUser}
-                timezone={appState.userTimezone}
-                onTimezoneChange={handleTimezoneChange}
                 dashboardStats={appState.dashboard}
                 servers={appState.servers}
                 trackerShares={appState.trackerShares}
@@ -353,8 +380,6 @@ export function HomeShell({ currentUser }: HomeShellProps) {
                 isMobile={isMobile}
                 isTablet={isTablet}
                 currentUser={currentUser}
-                timezone={appState.userTimezone}
-                onTimezoneChange={handleTimezoneChange}
                 torrents={appState.torrents}
                 categories={appState.categories}
                 tags={appState.tags}

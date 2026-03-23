@@ -40,8 +40,6 @@ interface MobileTopbarProps {
   uploadSpeed: number;
   showAddButton?: boolean;
   currentUser?: SessionUserIdentity;
-  timezone: string;
-  onTimezoneChange?: (timezone: string) => Promise<void>;
   addTorrentCategories?: Category[];
   addTorrentTags?: Tag[];
   supportsTorrentMetadata?: boolean;
@@ -55,8 +53,6 @@ export function MobileTopbar({
   uploadSpeed,
   showAddButton = true,
   currentUser,
-  timezone,
-  onTimezoneChange,
   addTorrentCategories = [],
   addTorrentTags = [],
   supportsTorrentMetadata = true,
@@ -105,7 +101,7 @@ export function MobileTopbar({
               <Plus className="w-4 h-4" />
             </Button>
           )}
-          <SettingsMenu user={currentUser} timezone={timezone} onTimezoneChange={onTimezoneChange}>
+          <SettingsMenu user={currentUser}>
             <Button
               variant="ghost"
               size="icon"
@@ -167,8 +163,6 @@ interface TopbarProps {
   // Actions
   showAddButton?: boolean;
   currentUser?: SessionUserIdentity;
-  timezone: string;
-  onTimezoneChange?: (timezone: string) => Promise<void>;
   addTorrentCategories?: Category[];
   addTorrentTags?: Tag[];
   supportsTorrentMetadata?: boolean;
@@ -194,8 +188,6 @@ export function Topbar({
   onFilterChange,
   showAddButton = true,
   currentUser,
-  timezone,
-  onTimezoneChange,
   addTorrentCategories = [],
   addTorrentTags = [],
   supportsTorrentMetadata = true,
@@ -340,7 +332,7 @@ export function Topbar({
         )}
 
         {/* Settings Menu */}
-        <SettingsMenu user={currentUser} timezone={timezone} onTimezoneChange={onTimezoneChange}>
+        <SettingsMenu user={currentUser}>
           <Button
             variant="ghost"
             className={cn(

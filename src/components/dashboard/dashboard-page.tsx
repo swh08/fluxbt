@@ -16,8 +16,6 @@ interface DashboardPageProps {
   isMobile?: boolean;
   isTablet?: boolean;
   currentUser?: SessionUserIdentity;
-  timezone: string;
-  onTimezoneChange?: (timezone: string) => Promise<void>;
   dashboardStats: DashboardStats;
   servers: ServerStats[];
   trackerShares: TrackerShare[];
@@ -30,8 +28,6 @@ export function DashboardPage({
   isMobile = false,
   isTablet = false,
   currentUser,
-  timezone,
-  onTimezoneChange,
   dashboardStats,
   servers,
   trackerShares,
@@ -48,8 +44,6 @@ export function DashboardPage({
           showSpeeds={false}
           showAddButton={false}
           currentUser={currentUser}
-          timezone={timezone}
-          onTimezoneChange={onTimezoneChange}
         />
       )}
 
