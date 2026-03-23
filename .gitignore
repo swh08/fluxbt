@@ -50,9 +50,11 @@ local-*
 .claude
 .z-ai-config
 dev.log
+docker-init.log
 test
 prompt
 
 server.log
+db/nextauth-secret
 # Skills directory
 /skills/

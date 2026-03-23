@@ -1,0 +1,16 @@
+.git
+.next
+artifacts
+coverage
+db/*
+!db/.gitkeep
+dev.log
+docker-init.log
+node_modules
+npm-debug.log*
+server.log
+.env
+.env.local
+.env.production
+.env.development
+*.tsbuildinfo

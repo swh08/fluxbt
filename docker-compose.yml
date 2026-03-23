@@ -1,0 +1,9 @@
+services:
+  app:
+    image: wshu7/fluxbt:latest
+    container_name: fluxbt
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./db:/app/db
+    restart: unless-stopped

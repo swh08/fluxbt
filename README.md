@@ -117,6 +117,59 @@ fluxbt/
 | `npm run db:migrate` | Run Prisma migrations |
 | `npm run db:reset` | Reset the database |
 
+### Docker Deployment
+
+You can deploy FluxBT as a prebuilt Docker image and run it with a single-service Docker Compose setup.
+
+#### 1. Build and push the image to Docker Hub
+
+```bash
+docker login
+docker build -t wshu7/fluxbt:latest .
+docker push wshu7/fluxbt:latest
+```
+
+#### 2. Configure `docker-compose.yml`
+
+Update the image name in `docker-compose.yml`:
+
+```yaml
+services:
+  app:
+    image: wshu7/fluxbt:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./db:/app/db
+    restart: unless-stopped
+```
+
+#### 3. Start the service
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+On first boot the container will:
+
+- create or reuse the SQLite database under `./db/custom.db`
+- generate and persist `NEXTAUTH_SECRET` under `./db/nextauth-secret`
+- run `prisma db push` automatically before starting the app
+
+#### 4. Update the service
+
+```bash
+docker build -t wshu7/fluxbt:latest .
+docker push wshu7/fluxbt:latest
+docker compose pull
+docker compose up -d
+```
+
+#### Optional environment overrides
+
+The Docker image is designed to boot without extra environment variables. If you later place the app behind HTTPS or a reverse proxy, you can optionally add `NEXTAUTH_URL` to the compose service for a fixed external URL.
+
 ### Screenshots
 
 The application includes:
