@@ -1,6 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useMemo, useSyncExternalStore } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+  useSyncExternalStore,
+  useEffect,
+} from 'react';
 import enMessages from '@/messages/en.json';
 import zhMessages from '@/messages/zh.json';
 
@@ -44,12 +52,22 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const initialLanguage = useInitialLanguage();
   const [language, setLanguageState] = useState<Language>(initialLanguage);
 
+  useEffect(() => {
+    setLanguageState(initialLanguage);
+  }, [initialLanguage]);
+
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
     if (typeof window !== 'undefined') {
       localStorage.setItem('torrent-manager-language', lang);
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = language;
+    }
+  }, [language]);
 
   const t = useCallback((key: string): string => {
     const keys = key.split('.');

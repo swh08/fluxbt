@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
 import { useBackground } from '@/contexts/background-context';
+import { formatServerVersion } from '@/lib/formatters';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -412,7 +413,7 @@ function SidebarContent({
         <div className={cn('p-3 border-t', sidebarBorderClass)}>
           {!isCollapsed ? (
             <p className="text-xs text-muted-foreground text-center">
-              {selectedServer ? `v${selectedServer.version}` : t('server.connecting')}
+              {selectedServer ? formatServerVersion(selectedServer.version) : t('server.connecting')}
             </p>
           ) : (
             <Button

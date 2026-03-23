@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useI18n } from '@/contexts/i18n-context';
 import { useBackground } from '@/contexts/background-context';
 import { ServerStats } from '@/lib/types';
-import { formatBytes, formatSpeed } from '@/lib/formatters';
+import { formatBytes, formatServerVersion, formatSpeed } from '@/lib/formatters';
 import { ArrowDown, ArrowUp, Server } from 'lucide-react';
 import { Sparkline } from '@/components/ui/sparkline';
 
@@ -78,7 +78,7 @@ function ServerCard({ server, isSelected, onClick, isMobile, hasBackground = fal
           'text-muted-foreground font-mono flex-shrink-0',
           isMobile ? 'text-[10px]' : 'text-xs'
         )}>
-          v{server.version}
+          {formatServerVersion(server.version)}
         </span>
       </div>
 

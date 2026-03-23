@@ -57,3 +57,13 @@ export function formatDate(date: Date): string {
     minute: '2-digit',
   });
 }
+
+export function formatServerVersion(version: string): string {
+  const normalized = version.trim();
+
+  if (!normalized || normalized === '--') {
+    return normalized || '--';
+  }
+
+  return normalized.startsWith('v') ? normalized : `v${normalized}`;
+}

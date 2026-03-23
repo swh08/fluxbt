@@ -152,6 +152,10 @@
     "timezone": "时区"
   },
   "auth": {
+    "loginTitle": "FluxBT",
+    "loginDescription": "登录以访问你的本地种子管理面板。",
+    "registerTitle": "创建你的 FluxBT 账号",
+    "registerDescription": "注册一个本地用户名来保护你的自托管仪表盘。",
     "username": "用户名",
     "usernamePlaceholder": "输入用户名",
     "password": "密码",

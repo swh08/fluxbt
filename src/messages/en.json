@@ -152,6 +152,10 @@
     "timezone": "Timezone"
   },
   "auth": {
+    "loginTitle": "FluxBT",
+    "loginDescription": "Sign in to access your local torrent dashboard.",
+    "registerTitle": "Create your FluxBT account",
+    "registerDescription": "Register a local username to protect your self-hosted dashboard.",
     "username": "Username",
     "usernamePlaceholder": "Enter a username",
     "password": "Password",
