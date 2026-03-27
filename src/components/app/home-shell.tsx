@@ -1,7 +1,15 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useMemo, useCallback, useSyncExternalStore, useEffect, useRef } from 'react';
+import {
+  startTransition,
+  useState,
+  useMemo,
+  useCallback,
+  useSyncExternalStore,
+  useEffect,
+  useRef,
+} from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DashboardPage } from '@/components/dashboard/dashboard-page';
 import { MobileSidebar, DesktopSidebar } from '@/components/layout/sidebar';
@@ -96,9 +104,11 @@ export function HomeShell({ currentUser }: HomeShellProps) {
     }
 
     const nextState = hydrateAppStateSnapshot((await response.json()) as AppStateSnapshot);
-    setAppState(nextState);
-    setSelectedServerId(nextState.selectedServerId);
-    setHasLoadedAppState(true);
+    startTransition(() => {
+      setAppState(nextState);
+      setSelectedServerId(nextState.selectedServerId);
+      setHasLoadedAppState(true);
+    });
     return nextState;
   }, []);
 
@@ -222,10 +232,12 @@ export function HomeShell({ currentUser }: HomeShellProps) {
 
     if (nextTimezone) {
       lastAutoSyncedTimezoneRef.current = nextTimezone;
-      setAppState((current) => ({
-        ...current,
-        userTimezone: nextTimezone,
-      }));
+      startTransition(() => {
+        setAppState((current) => ({
+          ...current,
+          userTimezone: nextTimezone,
+        }));
+      });
     }
 
     await refreshState(selectedServerId);

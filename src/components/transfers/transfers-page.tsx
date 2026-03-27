@@ -7,7 +7,14 @@ import { DetailsPanel } from '@/components/transfers/details-panel';
 import { MobileDetailsSheet } from '@/components/transfers/mobile-details-sheet';
 import type { AddTorrentSubmission } from '@/components/transfers/add-torrent-dialog';
 import { StatusFilter, type Category, type Tag, type Torrent } from '@/lib/types';
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import {
+  startTransition,
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+  useRef,
+} from 'react';
 import { useI18n } from '@/contexts/i18n-context';
 import { useBackground } from '@/contexts/background-context';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -80,9 +87,11 @@ export function TransfersPage({
   }, [selectedTorrentId]);
 
   useEffect(() => {
-    setSelectedTorrentId(null);
-    setSelectedTorrentDetails(null);
-    setDetailsSheetOpen(false);
+    startTransition(() => {
+      setSelectedTorrentId(null);
+      setSelectedTorrentDetails(null);
+      setDetailsSheetOpen(false);
+    });
   }, [selectedServerId]);
 
   const filteredTorrents = useMemo(() => {
@@ -109,7 +118,9 @@ export function TransfersPage({
 
   useEffect(() => {
     if (!selectedTorrentId || !selectedServerId) {
-      setSelectedTorrentDetails(null);
+      startTransition(() => {
+        setSelectedTorrentDetails(null);
+      });
       return;
     }
 
